@@ -1,0 +1,586 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Accessibility Widget - styles
+   All widget UI classes are prefixed with `a11y-` and `!important` so they
+   never clash with (or lose against) host site styles.
+   ========================================================================== */
+
+@layer base {
+  .a11y-widget-root {
+    --a11y-background: 0 0% 100%;
+    --a11y-foreground: 222.2 84% 4.9%;
+    --a11y-card: 0 0% 100%;
+    --a11y-card-foreground: 222.2 84% 4.9%;
+    --a11y-primary: 221.2 83.2% 53.3%;
+    --a11y-primary-foreground: 210 40% 98%;
+    --a11y-secondary: 210 40% 96.1%;
+    --a11y-secondary-foreground: 222.2 47.4% 11.2%;
+    --a11y-muted: 210 40% 96.1%;
+    --a11y-muted-foreground: 215.4 16.3% 46.9%;
+    --a11y-accent: 210 40% 96.1%;
+    --a11y-accent-foreground: 222.2 47.4% 11.2%;
+    --a11y-destructive: 0 84.2% 60.2%;
+    --a11y-destructive-foreground: 210 40% 98%;
+    --a11y-border: 214.3 31.8% 91.4%;
+    --a11y-input: 214.3 31.8% 91.4%;
+    --a11y-ring: 221.2 83.2% 53.3%;
+    --a11y-radius: 0.75rem;
+    --a11y-widget-accent: #1e3e7a;
+    --a11y-widget-accent-2: #bf141e;
+    --a11y-widget-accent-foreground: #ffffff;
+    --a11y-widget-bg: #ffffff;
+    --a11y-widget-text: #1f2937;
+    --a11y-widget-border: #e5e7eb;
+    --a11y-widget-muted: #f3f4f6;
+    --a11y-widget-z: 2147483000;
+    color-scheme: light;
+  }
+
+  .a11y-widget-root.a11y-widget--dark {
+    --a11y-background: 222.2 84% 4.9%;
+    --a11y-foreground: 210 40% 98%;
+    --a11y-card: 222.2 47.4% 11.2%;
+    --a11y-card-foreground: 210 40% 98%;
+    --a11y-primary: 217.2 91.2% 59.8%;
+    --a11y-primary-foreground: 222.2 47.4% 11.2%;
+    --a11y-secondary: 217.2 32.6% 17.5%;
+    --a11y-secondary-foreground: 210 40% 98%;
+    --a11y-muted: 217.2 32.6% 17.5%;
+    --a11y-muted-foreground: 215 20.2% 65.1%;
+    --a11y-accent: 217.2 32.6% 17.5%;
+    --a11y-accent-foreground: 210 40% 98%;
+    --a11y-destructive: 0 62.8% 30.6%;
+    --a11y-destructive-foreground: 210 40% 98%;
+    --a11y-border: 217.2 32.6% 17.5%;
+    --a11y-input: 217.2 32.6% 17.5%;
+    --a11y-ring: 224.3 76.3% 48%;
+    --a11y-widget-bg: #111827;
+    --a11y-widget-text: #f9fafb;
+    --a11y-widget-border: #374151;
+    --a11y-widget-muted: #1f2937;
+    color-scheme: dark;
+  }
+
+  .a11y-widget-root,
+  .a11y-widget-root * {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+      Roboto, Arial, sans-serif !important;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: hsl(var(--a11y-border));
+  }
+
+  body {
+    background-color: hsl(var(--a11y-background));
+    color: hsl(var(--a11y-foreground));
+  }
+}
+
+/* ==========================================================================
+   Host page effects - classes applied to <html> / <body> by the provider
+   ========================================================================== */
+
+/* --- Widget container ------------------------------------------------------
+   Hosts the widget OUTSIDE <body> so page-wide filters (color blindness,
+   reading mask) never affect the widget UI or its fixed positioning.
+   -------------------------------------------------------------------------- */
+.a11y-widget-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483000;
+}
+
+/* --- Font scaling ------------------------------------------------------ */
+html.a11y-font-scaling {
+  font-size: calc(100% * var(--a11y-font-scale, 1)) !important;
+}
+
+/* --- Text spacing (letter spacing + line height) ------------------------ */
+html.a11y-text-spacing
+  :where(p, li, span, a, div, h1, h2, h3, h4, h5, h6, blockquote, td, th, label, dt, dd, figcaption):not(
+    .a11y-widget-root *
+  ) {
+  letter-spacing: var(--a11y-letter-spacing, 0) !important;
+  line-height: var(--a11y-line-height, 1.5) !important;
+}
+
+/* --- Composed page-wide filters -----------------------------------------
+   Dark mode / inverted / grayscale / blue light / color blindness /
+   reading mask all stack on a single filter property so multiple tools
+   can be active at once. The whole list is composed in JS (never bare
+   `none` items, which would invalidate the declaration). The filter
+   applies to <body> only: the widget container lives outside <body>, so
+   the widget UI is never filtered.
+   ------------------------------------------------------------------------ */
+body.a11y-filtered {
+  filter: var(--a11y-filter, none);
+}
+
+/* --- Widget filter mirror ----------------------------------------------------
+   The page is filtered via body.a11y-filtered, but the widget lives OUTSIDE
+   <body>, so it mirrors the same composed filter (grayscale, color blindness,
+   dark mode, blue light) on its own root. The reading-mask dimming is NOT
+   mirrored, so the panel stays readable while the page dims. The color
+   blindness SVG defs are rendered OUTSIDE the root, so this filter can never
+   break the url(#a11y-cb-*) references.
+   -------------------------------------------------------------------------- */
+.a11y-widget-root.a11y-widget-filtered {
+  filter: var(--a11y-widget-filter, none);
+}
+
+/* --- Dark mode ---------------------------------------------------------- */
+html.a11y-dark-mode {
+  background-color: #ffffff !important;
+}
+
+html.a11y-dark-mode body {
+  background-color: #ffffff !important;
+}
+
+html.a11y-dark-mode
+  :where(img, video, canvas, iframe, picture, object, embed, [role="img"]):not(.a11y-widget-root *) {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* --- Contrast: high ----------------------------------------------------- */
+html.a11y-high-contrast body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.a11y-high-contrast
+  :where(p, li, span, div, section, article, header, footer, nav, aside, blockquote, td, th, caption, label, dt, dd, ul, ol, main):not(
+    .a11y-widget-root *
+  ) {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+html.a11y-high-contrast :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+html.a11y-high-contrast
+  :where(a, button, input, select, textarea, [role="button"]):not(.a11y-widget-root *) {
+  color: #ffff00 !important;
+  border-color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+html.a11y-high-contrast :where(a):not(.a11y-widget-root *) {
+  text-decoration: underline !important;
+}
+
+html.a11y-high-contrast :where(img, video, iframe) {
+  filter: brightness(1.1) contrast(1.2);
+}
+
+/* High contrast also reaches the widget panel, mirroring the page. */
+html.a11y-high-contrast .a11y-widget-root {
+  --a11y-widget-bg: #000000 !important;
+  --a11y-widget-text: #ffffff !important;
+  --a11y-widget-border: #ffffff !important;
+  --a11y-widget-muted: #000000 !important;
+}
+
+/* --- Link highlighting --------------------------------------------------- */
+html.a11y-links :where(a):not(.a11y-widget-root *) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+  background-color: rgba(255, 212, 0, 0.4) !important;
+  box-shadow: 0 2px 0 0 rgba(255, 166, 0, 0.9) !important;
+}
+
+/* --- Heading highlighting ------------------------------------------------ */
+html.a11y-headings :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  outline: 2px dashed #f97316 !important;
+  outline-offset: 4px !important;
+  background-color: rgba(255, 237, 160, 0.35) !important;
+}
+
+/* --- Hide images ----------------------------------------------------------
+   Only actual media elements are hidden — svg icons and [role="img"] stay
+   visible, and the widget panel is never affected.
+   -------------------------------------------------------------------------- */
+html.a11y-hide-images
+  :where(img, picture, video, canvas, iframe, object, embed):not(.a11y-widget-root *) {
+  visibility: hidden !important;
+}
+
+/* --- Text alignment ------------------------------------------------------- */
+html.a11y-text-align-left
+  :where(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dd, dt, figcaption, label, caption):not(
+    .a11y-widget-root *
+  ) {
+  text-align: left !important;
+}
+
+html.a11y-text-align-center
+  :where(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dd, dt, figcaption, label, caption):not(
+    .a11y-widget-root *
+  ) {
+  text-align: center !important;
+}
+
+html.a11y-text-align-right
+  :where(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dd, dt, figcaption, label, caption):not(
+    .a11y-widget-root *
+  ) {
+  text-align: right !important;
+}
+
+html.a11y-text-align-justify
+  :where(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dd, dt, figcaption, label, caption):not(
+    .a11y-widget-root *
+  ) {
+  text-align: justify !important;
+}
+
+/* --- Stop animations ------------------------------------------------------- */
+body.a11y-stop-animations *,
+body.a11y-stop-animations *::before,
+body.a11y-stop-animations *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* --- Large cursor ---------------------------------------------------------- */
+body.a11y-large-cursor,
+body.a11y-large-cursor
+  :where(a, button, input, select, textarea, label, summary, [role="button"], [role="link"], [role="menuitem"]) {
+  cursor: url("data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='48'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M6%203%20L6%2027%20L14%2021%20L18%2029%20L22%2027%20L18%2019%20L26%2019%20Z'%20fill='%23ffffff'%20stroke='%23000000'%20stroke-width='2.5'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      9 5,
+    auto !important;
+}
+
+/* --- Dyslexia friendly font ------------------------------------------------ */
+body.a11y-dyslexia-font
+  :where(p, li, h1, h2, h3, h4, h5, h6, span, a, div, td, th, blockquote, label, dt, dd, figcaption, summary) {
+  font-family: "OpenDyslexic", "Comic Sans MS", "Comic Sans", Verdana, Arial,
+    sans-serif !important;
+}
+
+/* --- Reading line --------------------------------------------------------- */
+.a11y-reading-line-el {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 1.5em;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--a11y-widget-accent) 25%, transparent),
+    color-mix(in srgb, var(--a11y-widget-accent) 55%, transparent)
+  );
+  border-top: 2px solid var(--a11y-widget-accent);
+  z-index: var(--a11y-widget-z);
+  transition: top 0.05s linear;
+}
+
+/* --- Reading mask ---------------------------------------------------------
+   A cursor-following spotlight: the window under the pointer stays bright,
+   everything outside it is softly darkened. Position is driven from JS via
+   left/top (mouse coordinates); the element centers itself with a
+   translate(-50%, -50%) transform.
+   -------------------------------------------------------------------------- */
+.a11y-reading-mask-el {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  width: min(700px, 80vw);
+  height: 260px;
+  border-radius: 24px;
+  border: 2px solid var(--a11y-widget-accent);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: var(--a11y-widget-z);
+  transition: left 0.05s linear, top 0.05s linear;
+}
+
+/* --- Focus visibility for the floating trigger ---------------------------- */
+.a11y-widget-root .a11y-trigger:focus-visible {
+  outline: 3px solid #fbbf24 !important;
+  outline-offset: 3px !important;
+}
+
+/* --- Trigger position ------------------------------------------------------ */
+.a11y-widget-root .a11y-trigger {
+  bottom: 24px;
+  right: 24px;
+}
+
+.a11y-widget-root.a11y-trigger--left .a11y-trigger {
+  right: auto;
+  left: 24px;
+}
+
+/* ==========================================================================
+   Panel UI
+   ========================================================================== */
+
+/* --- Panel shell ----------------------------------------------------------- */
+.a11y-widget-root .a11y-widget-panel {
+  width: min(500px, 100vw);
+}
+
+/* Full-width sheet on small viewports, respecting home-indicator safe area. */
+.a11y-widget-root .a11y-widget-panel.a11y-panel-mobile {
+  width: 100vw;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel {
+  width: min(530px, 100vw);
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel.a11y-panel-mobile {
+  width: 100vw;
+}
+
+/* --- Header ----------------------------------------------------------------- */
+.a11y-widget-root .a11y-panel-header {
+  background: linear-gradient(
+    135deg,
+    var(--a11y-widget-accent),
+    color-mix(in srgb, var(--a11y-widget-accent) 78%, #000000)
+  );
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 14px rgba(30, 62, 122, 0.25);
+}
+
+.a11y-widget-root .a11y-shortcut-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.a11y-widget-root .a11y-header-close {
+  background: rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.a11y-widget-root .a11y-header-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+.a11y-widget-root .a11y-header-lang {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease;
+}
+
+.a11y-widget-root .a11y-header-lang:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* --- Reset button ------------------------------------------------------------ */
+.a11y-widget-root .a11y-reset-button {
+  background-color: var(--a11y-widget-accent);
+}
+
+.a11y-widget-root .a11y-reset-button:hover {
+  background-color: color-mix(in srgb, var(--a11y-widget-accent) 80%, #000000);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+}
+
+/* --- Tool buttons ------------------------------------------------------------ */
+.a11y-widget-root .a11y-tool-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  height: 150px;
+  padding: 16px 10px 12px;
+  border: 1.5px solid var(--a11y-widget-border);
+  border-radius: 16px;
+  background: var(--a11y-widget-bg);
+  color: var(--a11y-widget-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.a11y-widget-root .a11y-tool-button:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--a11y-widget-accent) 40%,
+    var(--a11y-widget-border)
+  );
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+}
+
+.a11y-widget-root .a11y-tool-button:active {
+  transform: translateY(0);
+}
+
+.a11y-widget-root .a11y-tool-button.a11y-tool-active {
+  border-color: var(--a11y-widget-accent);
+  background: color-mix(in srgb, var(--a11y-widget-accent) 6%, #ffffff);
+  box-shadow: 0 0 0 1px var(--a11y-widget-accent);
+}
+
+.a11y-widget-root .a11y-tool-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--a11y-widget-accent) 10%, #ffffff);
+  color: var(--a11y-widget-accent);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.a11y-widget-root .a11y-tool-button.a11y-tool-active .a11y-tool-icon {
+  background: var(--a11y-widget-accent);
+  color: #ffffff;
+}
+
+.a11y-widget-root .a11y-tool-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  color: inherit;
+}
+
+/* Active tools may carry a longer label (e.g. "Renk Körü Modu (Kırmızı - Yeşil)")
+   that wraps over three lines; keep it inside the fixed button height. */
+.a11y-widget-root .a11y-tool-button.a11y-tool-active .a11y-tool-label {
+  font-size: 11px;
+}
+
+.a11y-widget-root .a11y-tool-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: auto;
+}
+
+.a11y-widget-root .a11y-tool-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d1d5db;
+  transition: background-color 0.2s ease;
+}
+
+.a11y-widget-root .a11y-tool-dot.a11y-tool-dot-on {
+  background: var(--a11y-widget-accent-2);
+}
+
+/* Enlarged panel: taller buttons, bigger icons */
+.a11y-widget-root.a11y-panel-enlarged .a11y-tool-button {
+  height: 180px;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-tool-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-tool-label {
+  font-size: 13px;
+}
+
+.a11y-widget-root .a11y-tool-button:focus-visible,
+.a11y-widget-root .a11y-panel-header button:focus-visible,
+.a11y-widget-root .a11y-panel-row button:focus-visible,
+.a11y-widget-root .a11y-panel-control:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* --- Scrollbar ---------------------------------------------------------------- */
+.a11y-widget-root .a11y-panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--a11y-widget-accent) 60%, #ffffff)
+    #eef1f6;
+}
+
+.a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--a11y-widget-accent) 60%, #ffffff);
+  border-radius: 3px;
+}
+
+/* --- Profiles list scrollbar ---------------------------------------------------- */
+.a11y-widget-root .a11y-profiles-list {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--a11y-widget-accent) 25%, transparent) transparent;
+}
+
+.a11y-widget-root .a11y-profiles-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.a11y-widget-root .a11y-profiles-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.a11y-widget-root .a11y-profiles-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--a11y-widget-accent) 25%, transparent);
+  border-radius: 10px;
+}
+
+.a11y-widget-root .a11y-profiles-list:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--a11y-widget-accent) 40%, transparent);
+}
+
+/* --- Entry animation ------------------------------------------------------------ */
+.a11y-widget-root .a11y-panel-anim {
+  animation: a11y-panel-in 0.35s ease-out both;
+}
+
+@keyframes a11y-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a11y-widget-root *,
+  .a11y-widget-root *::before,
+  .a11y-widget-root *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

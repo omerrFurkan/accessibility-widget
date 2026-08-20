@@ -1,0 +1,79 @@
+{
+  "name": "@company/accessibility-widget",
+  "version": "0.1.0",
+  "description": "A lightweight, embeddable accessibility widget for React applications (WCAG-focused)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite --config vite.demo.config.ts",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --config vite.demo.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "widget",
+    "wcag",
+    "react",
+    "nextjs"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.454.0",
+    "tailwind-merge": "^2.5.5"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-dts": "^4.3.0",
+    "vitest": "^2.1.5"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}

@@ -1,0 +1,180 @@
+import type { AccessibilitySettings, ColorBlindnessMode, ContrastMode } from "./types";
+
+export const FILTER_NONE = "none";
+const INVERT_FILTER = "invert(1) hue-rotate(180deg)";
+const BLUE_LIGHT_FILTER = "sepia(0.4) hue-rotate(-8deg) saturate(0.85) brightness(1.03)";
+
+/** Contrast modes expressed as page-wide color filters. */
+const CONTRAST_FILTERS: Record<Exclude<ContrastMode, "normal" | "high">, string> = {
+  dark: "invert(1) hue-rotate(180deg) contrast(1.05)",
+  light: "brightness(1.08) contrast(1.02)",
+  warm: "sepia(0.25) hue-rotate(-12deg) saturate(1.15)",
+  cold: "hue-rotate(12deg) saturate(1.05)",
+};
+
+const COLOR_BLINDNESS_VALUES: readonly Exclude<ColorBlindnessMode, "none">[] = [
+  "protanopia",
+  "deuteranopia",
+  "tritanopia",
+  "achromatopsia",
+];
+
+/**
+ * Media elements that were playing and have been paused by the stop-animations
+ * setting. Only these get resumed once the setting is turned off again.
+ */
+const PAUSED_MEDIA = new WeakSet<HTMLMediaElement>();
+
+function pauseMedia(stop: boolean): void {
+  const media = Array.from(
+    document.querySelectorAll<HTMLMediaElement>("video, audio"),
+  ).filter((el) => !el.closest("[data-a11y-widget]"));
+  if (stop) {
+    media.forEach((el) => {
+      if (!el.paused) {
+        el.pause();
+        PAUSED_MEDIA.add(el);
+      }
+    });
+  } else {
+    media.forEach((el) => {
+      if (PAUSED_MEDIA.has(el)) {
+        void el.play().catch(() => undefined);
+        PAUSED_MEDIA.delete(el);
+      }
+    });
+  }
+}
+
+function classList(root: HTMLElement): DOMTokenList {
+  return root.classList;
+}
+
+/**
+ * Builds the composed, stackable filter list for the given settings.
+ * The list is built WITHOUT "none" entries: `none` is only valid as the
+ * whole filter value, and a bare `none` inside a filter function list
+ * makes the entire declaration invalid at computed-value time in real
+ * browsers (jsdom never catches this because it does not compute CSS).
+ * Exported so the widget can mirror the same filter on its own UI.
+ * Note: the reading mask is NOT part of this list — it is a standalone
+ * overlay that dims the page around a cursor-following window.
+ */
+export function composeFilter(settings: AccessibilitySettings): string {
+  const invert =
+    settings.darkMode || settings.contrast === "dark"
+      ? settings.contrast === "dark"
+        ? CONTRAST_FILTERS.dark
+        : INVERT_FILTER
+      : FILTER_NONE;
+  const grayscale =
+    settings.grayscaleLevel > 0
+      ? `grayscale(${settings.grayscaleLevel * 0.25})`
+      : FILTER_NONE;
+  const blueLight = settings.blueLightFilter ? BLUE_LIGHT_FILTER : FILTER_NONE;
+  const cbFilter =
+    settings.colorBlindness === "none"
+      ? FILTER_NONE
+      : `url(#a11y-cb-${settings.colorBlindness})`;
+  const contrastTemp =
+    settings.contrast === "warm" ||
+    settings.contrast === "cold" ||
+    settings.contrast === "light"
+      ? CONTRAST_FILTERS[settings.contrast]
+      : FILTER_NONE;
+
+  return (
+    [invert, grayscale, blueLight, cbFilter, contrastTemp]
+      .filter((value) => value !== FILTER_NONE)
+      .join(" ") || FILTER_NONE
+  );
+}
+
+export function applySettings(settings: AccessibilitySettings): void {
+  const root = document.documentElement;
+  const body = document.body;
+  const rootClasses = classList(root);
+  const bodyClasses = classList(body);
+
+  root.style.setProperty("--a11y-font-scale", String(settings.fontSizeScale));
+  root.style.setProperty(
+    "--a11y-letter-spacing",
+    `${(settings.letterSpacing - 1) * 0.05}em`,
+  );
+  root.style.setProperty(
+    "--a11y-line-height",
+    `${1.3 + (settings.lineHeight - 1) * 0.15}`,
+  );
+
+  // Composed page-wide filters (single filter property, stackable).
+  const filterList = composeFilter(settings);
+
+  // The filter lives on <body>. The widget container is mounted outside
+  // <body>, so the widget UI is never filtered.
+  body.style.setProperty("--a11y-filter", filterList);
+  bodyClasses.toggle("a11y-filtered", filterList !== FILTER_NONE);
+
+  rootClasses.toggle("a11y-font-scaling", settings.fontSizeScale !== 1);
+  rootClasses.toggle(
+    "a11y-text-spacing",
+    settings.letterSpacing !== 1 || settings.lineHeight !== 1,
+  );
+
+  rootClasses.toggle("a11y-dark-mode", settings.darkMode);
+  rootClasses.toggle("a11y-high-contrast", settings.contrast === "high");
+
+  rootClasses.toggle("a11y-links", settings.highlightLinks);
+  rootClasses.toggle("a11y-headings", settings.highlightHeadings);
+
+  rootClasses.toggle("a11y-hide-images", settings.hideImages);
+  rootClasses.toggle("a11y-text-align-left", settings.textAlign === "left");
+  rootClasses.toggle("a11y-text-align-center", settings.textAlign === "center");
+  rootClasses.toggle("a11y-text-align-right", settings.textAlign === "right");
+  rootClasses.toggle("a11y-text-align-justify", settings.textAlign === "justify");
+
+  bodyClasses.toggle("a11y-stop-animations", settings.stopAnimations);
+  bodyClasses.toggle("a11y-large-cursor", settings.largeCursor);
+  bodyClasses.toggle("a11y-dyslexia-font", settings.dyslexiaFont);
+
+  pauseMedia(settings.stopAnimations);
+}
+
+export function clearSettingsEffects(): void {
+  const root = document.documentElement;
+  const body = document.body;
+
+  root.style.removeProperty("--a11y-font-scale");
+  root.style.removeProperty("--a11y-letter-spacing");
+  root.style.removeProperty("--a11y-line-height");
+
+  body.style.removeProperty("--a11y-filter");
+
+  root.classList.remove(
+    "a11y-font-scaling",
+    "a11y-text-spacing",
+    "a11y-dark-mode",
+    "a11y-high-contrast",
+    "a11y-links",
+    "a11y-headings",
+    "a11y-hide-images",
+    "a11y-text-align-left",
+    "a11y-text-align-center",
+    "a11y-text-align-right",
+    "a11y-text-align-justify",
+  );
+
+  body.classList.remove(
+    "a11y-filtered",
+    "a11y-stop-animations",
+    "a11y-large-cursor",
+    "a11y-dyslexia-font",
+  );
+
+  // Remove any legacy color blindness classes (kept for safety).
+  for (const mode of COLOR_BLINDNESS_VALUES) {
+    body.classList.remove(`a11y-cb-${mode}`);
+  }
+
+  // Resume any media that the stop-animations setting had paused.
+  pauseMedia(false);
+}
