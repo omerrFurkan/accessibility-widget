@@ -166,7 +166,3 @@ Provider ayarları `localStorage`’da tutar, `<html>` / `<body>` üzerine `a11y
 - **2.4.7 Odak görünürlüğü:** sarı `outline` (`#fbbf24`), odak tuzağı `Tab` sarma, `inert` + `aria-hidden` filtresi
 - **4.1.3 Durum mesajları:** `aria-live="polite" role="status" aria-atomic` ile profil/dil/sıfırla anonsu
 - **2.5.8 Hedef boyutu:** profil bilgi butonu `24px` (AA)
-
-## Lisans
-
-MIT
