@@ -28,7 +28,7 @@ export const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
     descriptionKey: "profileDescLowVision",
     detailsKey: "profileDetailsLowVision",
     settings: {
-      fontSizeScale: 1.3,
+      fontSizeScale: 1.5,
       contrast: "high",
       lineHeight: 3,
       largeCursor: true,
@@ -71,7 +71,7 @@ export const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
     descriptionKey: "profileDescElderly",
     detailsKey: "profileDetailsElderly",
     settings: {
-      fontSizeScale: 1.15,
+      fontSizeScale: 1.25,
       lineHeight: 3,
       letterSpacing: 1,
       largeCursor: true,

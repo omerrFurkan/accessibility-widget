@@ -8,6 +8,10 @@ const FOCUSABLE_SELECTOR = [
   "select:not([disabled])",
   "textarea:not([disabled])",
   "[tabindex]:not([tabindex='-1'])",
+  "audio[controls]",
+  "video[controls]",
+  "[contenteditable='true']",
+  "details > summary",
 ].join(", ");
 
 /**
@@ -30,7 +34,9 @@ export function useFocusTrap(
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const getFocusable = () =>
-      Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (el) => el.getAttribute("aria-hidden") !== "true",
+      );
 
     const focusables = getFocusable();
     if (focusables.length > 0) {
@@ -63,7 +69,10 @@ export function useFocusTrap(
     container.addEventListener("keydown", onKeyDown);
     return () => {
       container.removeEventListener("keydown", onKeyDown);
-      previouslyFocused?.focus();
+      // Only restore focus if the previously focused element is still in the document
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
     };
   }, [containerRef, active]);
 }

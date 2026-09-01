@@ -173,7 +173,9 @@ describe("AccessibilityWidget", () => {
     expect(page.getByRole("button", { name: "Metin Büyütme: %200" })).toBeInTheDocument();
 
     await user.click(page.getByRole("button", { name: "Metin Büyütme: %200" }));
+    // Growth-only cycle wraps back to default (no shrinking).
     expect(document.documentElement.classList.contains("a11y-font-scaling")).toBe(false);
+    expect(page.getByRole("button", { name: "Metin Büyütme: %100" })).toBeInTheDocument();
   });
 
   it("applies a profile and clears the marker on manual changes", async () => {

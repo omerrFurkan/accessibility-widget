@@ -22,6 +22,7 @@ export interface AccessibilityPanelProps {
   onOpenPageStructure: () => void;
   /** Hide the panel from assistive tech + interaction (e.g. while a modal overlay is open). */
   inert?: boolean;
+  shortcutHint?: string;
 }
 
 export function AccessibilityPanel({
@@ -35,6 +36,7 @@ export function AccessibilityPanel({
   pageStructureOpen,
   onOpenPageStructure,
   inert = false,
+  shortcutHint,
 }: AccessibilityPanelProps) {
   const { isPanelOpen, closePanel, reset } = useAccessibility();
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +92,7 @@ export function AccessibilityPanel({
               {labels.panelTitle}
             </h2>
             <span className="a11y-shortcut-badge" title={labels.languageToggleLabel}>
-              <kbd>( {labels.shortcutHint} )</kbd>
+              <kbd>( {shortcutHint ?? labels.shortcutHint} )</kbd>
             </span>
           </div>
           <p className="a11y-mt-0.5 a11y-text-xs a11y-text-[var(--a11y-widget-accent-foreground)]">
@@ -154,6 +156,7 @@ export function AccessibilityPanel({
             labels={labels}
             pageStructureOpen={pageStructureOpen}
             onOpenPageStructure={onOpenPageStructure}
+            onAnnounce={onAnnounce}
           />
         </div>
       </div>

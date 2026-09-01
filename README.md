@@ -11,13 +11,18 @@ A modern, lightweight, embeddable accessibility widget for React applications. I
 ## Features
 
 - Text zoom cycling 100 / 115 / 130 / 150% (`--a11y-font-scale`)
+- Bidirectional text zoom %80–%200 — the scale shrinks below 100% as well as up
+- Built-in voice reading (TTS): hover, selection and continuous read-aloud modes
+- Mute sounds tool (silences audio/video elements on the page)
 - Contrast modes: High Contrast / Inverted (plus grayscale as a separate intensity control)
 - Dark mode (`.a11y-dark-mode`, invert strategy with media + widget compensation)
-- Reading tools: letter spacing, line height, reading line, reading mask
-- Visual assist: link highlighting, heading highlighting, color blindness filters (protanopia, deuteranopia, tritanopia, achromatopsia), image hiding, animation pausing, large cursor, text alignment, blue-light filter
+- Reading tools: letter spacing, line height, reading line, yellow marker strip (pointer-following tint band, Ege "Sarı Şerit" parity), reading mask
+- Visual assist: link highlighting, plain link underlining (Ege "Altını Çiz" parity), heading highlighting, color blindness filters (protanopia, deuteranopia, tritanopia, achromatopsia), image hiding, animation pausing, large cursor, text alignment, blue-light filter
+- Enlarged-panel mode with real scaling for low-vision users
+- Bundled OpenDyslexic dyslexia font (self-hosted, no Google Fonts dependency)
 - 5 one-click accessibility profiles (low vision, color blindness, dyslexia, cognitive, screen reader)
 - Turkish (default) and English UI, toggleable at runtime and persisted
-- `ALT + A` keyboard shortcut to open/close the widget (disable via `enableShortcut`)
+- Customizable keyboard shortcut (default `ALT + A`; disable via `enableShortcut`)
 - Preferences persisted across sessions (localStorage), synced across tabs
 
 ## Installation
@@ -69,7 +74,60 @@ export default function App() {
 | `language`      | `"tr" \| "en"`        | `"tr"`       | Initial UI language (persisted across sessions) |
 | `labels`        | `Partial<AccessibilityWidgetLabels>` | Turkish defaults | Custom UI copy (overrides `language`) |
 | `branding`      | `string \| undefined` | —            | Footer text shown under the reset bar |
-| `enableShortcut`| `boolean`             | `true`       | Enable `ALT + A` toggle shortcut       |
+| `enableShortcut`| `boolean`             | `true`       | Enable keyboard shortcut toggle (see `shortcut`) |
+| `shortcut`      | `string`              | `"Alt+A"`    | Shortcut as "+"-separated tokens (e.g. `"Ctrl+Shift+S"`); invalid values fall back to `"Alt+A"` |
+| `openParam`     | `string \| null`      | `"a11y"`     | URL query parameter controlling the panel on load (`?a11y=open\|close\|toggle`); pass `null` to disable |
+
+## Integration
+
+### Footer link
+
+Open the widget from any host-page element, e.g. an "Erişilebilirlik" footer link:
+
+```tsx
+<a
+  href="#erasilebilirlik"
+  onClick={(e) => {
+    e.preventDefault();
+    window.accessibilityWidget?.open();
+  }}
+>
+  Erişilebilirlik
+</a>
+```
+
+The global API also exposes `window.accessibilityWidget.close()` and `.toggle()`.
+
+### URL parameter
+
+Use the `openParam` query parameter (default `a11y`) to control the panel on page load:
+
+```
+https://example.com/?a11y=open    # opens the panel
+https://example.com/?a11y=close   # closes the panel
+https://example.com/?a11y=toggle  # toggles the panel
+```
+
+Any other value is ignored; rename the parameter or disable it with the `openParam` prop.
+
+### Custom shortcut
+
+```tsx
+<AccessibilityWidget shortcut="Ctrl+Shift+S" />
+```
+
+Modifiers: `Alt`, `Ctrl`, `Shift`, `Meta`/`Cmd`; the final token must be a letter A–Z or digit 0–9. Invalid strings silently fall back to `Alt+A`.
+
+### Avoid flash of unstyled settings (SSR/MPA)
+
+Persisted settings are normally restored after hydration. Include the early-apply script in your `<head>` to replay persisted localStorage settings before first paint:
+
+```tsx
+import { createEarlyApplyScript } from "@company/accessibility-widget";
+
+// Next.js App Router / any MPA <head>:
+<script dangerouslySetInnerHTML={{ __html: createEarlyApplyScript() }} />
+```
 
 ## Development
 

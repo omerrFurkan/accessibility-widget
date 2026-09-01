@@ -1,4 +1,4 @@
-import type { AccessibilitySettings } from "./types";
+import type { AccessibilitySettings, VoiceReadingMode } from "./types";
 import {
   COLOR_BLINDNESS_LEVELS,
   CONTRAST_LEVELS,
@@ -9,6 +9,7 @@ import {
   SPACING_MAX,
   SPACING_MIN,
   TEXT_ALIGN_LEVELS,
+  VOICE_READING_LEVELS,
 } from "./types";
 
 const COLOR_BLINDNESS_VALUES: readonly string[] = COLOR_BLINDNESS_LEVELS;
@@ -18,15 +19,20 @@ const TEXT_ALIGN_VALUES: readonly string[] = TEXT_ALIGN_LEVELS;
 const BOOLEAN_KEYS: readonly (keyof AccessibilitySettings)[] = [
   "darkMode",
   "highlightLinks",
+  "underlineLinks",
   "highlightHeadings",
   "readingLine",
+  "markerLine",
   "hideImages",
   "stopAnimations",
   "largeCursor",
   "blueLightFilter",
   "readingMask",
   "dyslexiaFont",
+  "muteSounds",
 ];
+
+const VOICE_READING_VALUES: readonly string[] = VOICE_READING_LEVELS;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -63,14 +69,24 @@ export function normalizeSettings(
     out.textAlign = src.textAlign as AccessibilitySettings["textAlign"];
   }
 
+  if (typeof src.voiceReading === "string" && VOICE_READING_VALUES.includes(src.voiceReading)) {
+    out.voiceReading = src.voiceReading as VoiceReadingMode;
+  }
+
   if (typeof src.fontSizeScale === "number") {
     out.fontSizeScale = clamp(src.fontSizeScale, FONT_SCALE_MIN, FONT_SCALE_MAX);
   }
   if (typeof src.letterSpacing === "number") {
     out.letterSpacing = clamp(Math.round(src.letterSpacing), SPACING_MIN, SPACING_MAX);
   }
+  if (typeof src.wordSpacing === "number") {
+    out.wordSpacing = clamp(Math.round(src.wordSpacing), SPACING_MIN, SPACING_MAX);
+  }
   if (typeof src.lineHeight === "number") {
     out.lineHeight = clamp(Math.round(src.lineHeight), SPACING_MIN, SPACING_MAX);
+  }
+  if (typeof src.paragraphSpacing === "number") {
+    out.paragraphSpacing = clamp(Math.round(src.paragraphSpacing), SPACING_MIN, SPACING_MAX);
   }
   if (typeof src.grayscaleLevel === "number") {
     out.grayscaleLevel = clamp(Math.round(src.grayscaleLevel), 0, GRAYSCALE_MAX);

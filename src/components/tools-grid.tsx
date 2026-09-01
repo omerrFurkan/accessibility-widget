@@ -5,6 +5,7 @@ import {
   Eye,
   Frame,
   Heading1,
+  Highlighter,
   ImageOff,
   Link2,
   ListTree,
@@ -16,6 +17,9 @@ import {
   Ruler,
   Sun,
   Type,
+  Underline,
+  Volume2,
+  VolumeX,
   ZoomIn,
 } from "lucide-react";
 import { useAccessibility } from "@/context/accessibility-context";
@@ -25,6 +29,7 @@ import {
   FONT_SCALE_LEVELS,
   SPACING_LEVELS,
   TEXT_ALIGN_LEVELS,
+  VOICE_READING_LEVELS,
 } from "@/context/types";
 import type {
   ColorBlindnessMode,
@@ -33,6 +38,7 @@ import type {
 } from "@/context/types";
 import type { AccessibilityWidgetLabels } from "./labels";
 import { ToolButton } from "./tool-button";
+import { voiceModeLabel } from "./voice-reading";
 
 function cycle<T>(levels: readonly T[], current: T): T {
   const index = levels.indexOf(current);
@@ -108,18 +114,24 @@ export interface ToolsGridProps {
   labels: AccessibilityWidgetLabels;
   pageStructureOpen: boolean;
   onOpenPageStructure: () => void;
+  onAnnounce?: (message: string) => void;
 }
 
 export function ToolsGrid({
   labels,
   pageStructureOpen,
   onOpenPageStructure,
+  onAnnounce,
 }: ToolsGridProps) {
   const { settings, update } = useAccessibility();
+  const announce = (msg: string) => onAnnounce?.(msg);
 
   const zoomIndex = nearestIndex(FONT_SCALE_LEVELS as readonly number[], settings.fontSizeScale);
   const zoomActive = settings.fontSizeScale !== 1;
-  const zoomPercent = Math.round(FONT_SCALE_LEVELS[zoomIndex] * 100);
+  const zoomPercent = Math.round(settings.fontSizeScale * 100);
+  // Growth-only: index maps directly to dots (1→0, 1.25→1, 1.5→2, 2→3)
+  // so the first press lights exactly one dot.
+  const zoomDotLevel = zoomActive ? zoomIndex : 0;
 
   const cbIndex = COLOR_BLINDNESS_LEVELS.indexOf(settings.colorBlindness);
   const cbActive = settings.colorBlindness !== "none";
@@ -134,6 +146,7 @@ export function ToolsGrid({
     : labels.toolColorBlind;
 
   const grayActive = settings.grayscaleLevel > 0;
+  const grayNext = grayActive ? 0 : 4;
 
   const contrastIndex = CONTRAST_LEVELS.indexOf(settings.contrast);
   const contrastActive = settings.contrast !== "normal";
@@ -153,17 +166,25 @@ export function ToolsGrid({
   const alignIndex = TEXT_ALIGN_LEVELS.indexOf(settings.textAlign);
   const alignActive = settings.textAlign !== "none";
 
+  const vrIndex = VOICE_READING_LEVELS.indexOf(settings.voiceReading);
+  const voiceActive = settings.voiceReading !== "none";
+  const voiceLabel = voiceActive
+    ? `${labels.toolVoiceReading} (${voiceModeLabel(settings.voiceReading, labels)})`
+    : labels.toolVoiceReading;
+
   return (
     <div className="a11y-grid a11y-grid-cols-2 a11y-gap-3">
       <ToolButton
         icon={ZoomIn}
         label={labels.toolTextZoom}
         active={zoomActive}
-        level={zoomIndex}
+        level={zoomDotLevel}
         dotCount={3}
-        onClick={() =>
-          update({ fontSizeScale: cycle(FONT_SCALE_LEVELS, FONT_SCALE_LEVELS[zoomIndex]) })
-        }
+        onClick={() => {
+          const next = cycle(FONT_SCALE_LEVELS, FONT_SCALE_LEVELS[zoomIndex]);
+          update({ fontSizeScale: next });
+          announce(`${labels.toolTextZoom}: %${Math.round(next * 100)}`);
+        }}
         aria-label={`${labels.toolTextZoom}: %${zoomPercent}`}
       />
       <ToolButton
@@ -185,9 +206,12 @@ export function ToolsGrid({
         icon={Palette}
         label={labels.toolGrayscale}
         active={grayActive}
-        onClick={() =>
-          update({ grayscaleLevel: grayActive ? 0 : 4 })
-        }
+        level={settings.grayscaleLevel}
+        dotCount={4}
+        onClick={() => {
+          update({ grayscaleLevel: grayNext });
+          announce(`${labels.toolGrayscale}: ${grayNext > 0 ? `100%` : labels.contrastNormal}`);
+        }}
         aria-label={labels.toolGrayscale}
       />
       <ToolButton
@@ -218,6 +242,13 @@ export function ToolsGrid({
         aria-label={labels.toolHighlightLinks}
       />
       <ToolButton
+        icon={Underline}
+        label={labels.toolUnderlineLinks}
+        active={settings.underlineLinks}
+        onClick={() => update({ underlineLinks: !settings.underlineLinks })}
+        aria-label={labels.toolUnderlineLinks}
+      />
+      <ToolButton
         icon={Heading1}
         label={labels.toolHighlightHeadings}
         active={settings.highlightHeadings}
@@ -232,11 +263,31 @@ export function ToolsGrid({
         aria-label={labels.toolReadingLine}
       />
       <ToolButton
+        icon={Highlighter}
+        label={labels.toolMarkerLine}
+        active={settings.markerLine}
+        onClick={() => update({ markerLine: !settings.markerLine })}
+        aria-label={labels.toolMarkerLine}
+      />
+      <ToolButton
         icon={Frame}
         label={labels.toolReadingMask}
         active={settings.readingMask}
         onClick={() => update({ readingMask: !settings.readingMask })}
         aria-label={labels.toolReadingMask}
+      />
+      <ToolButton
+        icon={Volume2}
+        label={voiceLabel}
+        active={voiceActive}
+        level={voiceActive ? vrIndex + 1 : 0}
+        dotCount={3}
+        onClick={() => update({ voiceReading: cycle(VOICE_READING_LEVELS, settings.voiceReading) })}
+        aria-label={`${labels.toolVoiceReading}: ${
+          voiceActive
+            ? voiceModeLabel(settings.voiceReading, labels)
+            : labels.contrastNormal
+        }`}
       />
       <ToolButton
         icon={MousePointer2}
@@ -260,6 +311,13 @@ export function ToolsGrid({
         aria-label={labels.toolStopAnimations}
       />
       <ToolButton
+        icon={VolumeX}
+        label={labels.toolMuteSounds}
+        active={settings.muteSounds}
+        onClick={() => update({ muteSounds: !settings.muteSounds })}
+        aria-label={labels.toolMuteSounds}
+      />
+      <ToolButton
         icon={ImageOff}
         label={labels.toolHideImages}
         active={settings.hideImages}
@@ -276,12 +334,14 @@ export function ToolsGrid({
       <ToolButton
         icon={Rows3}
         label={labels.toolLineHeight}
-        active={settings.lineHeight > 1}
+        active={settings.lineHeight > 1 || settings.paragraphSpacing > 1}
         level={lineHeightIndex}
         dotCount={3}
-        onClick={() =>
-          update({ lineHeight: cycle(SPACING_LEVELS, SPACING_LEVELS[lineHeightIndex]) })
-        }
+        onClick={() => {
+          const next = cycle(SPACING_LEVELS, SPACING_LEVELS[lineHeightIndex]);
+          update({ lineHeight: next, paragraphSpacing: next });
+          announce(`${labels.toolLineHeight}: ${next}`);
+        }}
         aria-label={`${labels.toolLineHeight}: ${SPACING_LEVELS[lineHeightIndex]}`}
       />
       <ToolButton
@@ -300,12 +360,14 @@ export function ToolsGrid({
       <ToolButton
         icon={CaseSensitive}
         label={labels.toolLetterSpacing}
-        active={settings.letterSpacing > 1}
+        active={settings.letterSpacing > 1 || settings.wordSpacing > 1}
         level={spacingIndex}
         dotCount={3}
-        onClick={() =>
-          update({ letterSpacing: cycle(SPACING_LEVELS, SPACING_LEVELS[spacingIndex]) })
-        }
+        onClick={() => {
+          const next = cycle(SPACING_LEVELS, SPACING_LEVELS[spacingIndex]);
+          update({ letterSpacing: next, wordSpacing: next });
+          announce(`${labels.toolLetterSpacing}: ${next}`);
+        }}
         aria-label={`${labels.toolLetterSpacing}: ${SPACING_LEVELS[spacingIndex]}`}
       />
       <ToolButton

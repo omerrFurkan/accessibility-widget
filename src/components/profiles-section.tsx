@@ -132,7 +132,7 @@ export function ProfilesSection({ labels, open, onToggle }: ProfilesSectionProps
                     aria-expanded={detailsOpen}
                     aria-controls={`a11y-profile-details-${profile.id}`}
                     aria-label={labels.profileInfoToggle}
-                    className="a11y-inline-flex a11y-size-[22px] a11y-shrink-0 a11y-items-center a11y-justify-center a11y-rounded-full a11y-bg-[var(--a11y-widget-muted)] a11y-text-muted-foreground a11y-transition-all hover:a11y-bg-[var(--a11y-widget-accent)]/10 hover:a11y-scale-110 hover:a11y-text-[var(--a11y-widget-accent)]"
+                    className="a11y-inline-flex a11y-size-6 a11y-shrink-0 a11y-items-center a11y-justify-center a11y-rounded-full a11y-bg-[var(--a11y-widget-muted)] a11y-text-muted-foreground a11y-transition-all hover:a11y-bg-[var(--a11y-widget-accent)]/10 hover:a11y-scale-110 hover:a11y-text-[var(--a11y-widget-accent)]"
                   >
                     <Info className="a11y-size-4" aria-hidden="true" />
                   </button>

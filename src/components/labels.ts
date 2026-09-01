@@ -23,10 +23,12 @@ export interface AccessibilityWidgetLabels {
   toolGrayscale: string;
   toolContrast: string;
   toolDarkMode: string;
-  toolHighlightLinks: string;
-  toolHighlightHeadings: string;
-  toolReadingLine: string;
-  toolReadingMask: string;
+   toolHighlightLinks: string;
+   toolUnderlineLinks: string;
+   toolHighlightHeadings: string;
+   toolReadingLine: string;
+   toolMarkerLine: string;
+   toolReadingMask: string;
   toolLargeCursor: string;
   toolBlueLight: string;
   toolStopAnimations: string;
@@ -34,8 +36,15 @@ export interface AccessibilityWidgetLabels {
   toolDyslexiaFont: string;
   toolLineHeight: string;
   toolTextAlign: string;
-  toolLetterSpacing: string;
-  toolPageStructure: string;
+   toolLetterSpacing: string;
+   toolPageStructure: string;
+   toolVoiceReading: string;
+   voiceModeHover: string;
+   voiceModeSelection: string;
+   voiceModeContinuous: string;
+   announceVoiceReadingStarted: string;
+   announceVoiceReadingStopped: string;
+   toolMuteSounds: string;
   profileInfoToggle: string;
   profileAdhd: string;
   profileDescAdhd: string;
@@ -82,6 +91,7 @@ export interface AccessibilityWidgetLabels {
   pageStructureEmpty: string;
   pageStructureClose: string;
   pageStructureRefresh: string;
+  skipLink: string;
 }
 
 export const LABELS_TR: AccessibilityWidgetLabels = {
@@ -108,8 +118,10 @@ export const LABELS_TR: AccessibilityWidgetLabels = {
   toolContrast: "Kontrast Modu",
   toolDarkMode: "Koyu Mod",
   toolHighlightLinks: "Linkleri Vurgula",
+  toolUnderlineLinks: "Linkleri Altına Çiz",
   toolHighlightHeadings: "Başlıkları Vurgula",
   toolReadingLine: "Okuma Çizgisi",
+  toolMarkerLine: "Sarı Şerit",
   toolReadingMask: "Okuma Maskesi",
   toolLargeCursor: "Büyük İmleç",
   toolBlueLight: "Mavi Işık Filtresi",
@@ -120,6 +132,13 @@ export const LABELS_TR: AccessibilityWidgetLabels = {
   toolTextAlign: "Metin Hizalama",
   toolLetterSpacing: "Harf Aralığı",
   toolPageStructure: "Sayfa Yapısı",
+  toolVoiceReading: "Sesli Okuma",
+  voiceModeHover: "Üzerine Gelince",
+  voiceModeSelection: "Seçili Metni Oku",
+  voiceModeContinuous: "Sürekli Oku",
+  announceVoiceReadingStarted: "Sesli okuma başlatıldı",
+  announceVoiceReadingStopped: "Sesli okuma durduruldu",
+  toolMuteSounds: "Sesleri Sustur",
   profileInfoToggle: "Profil özelliklerini göster",
   profileAdhd: "DEHB Desteği",
   profileDescAdhd: "Dikkat dağınıklığını azaltır ve odaklanmayı kolaylaştırır",
@@ -166,6 +185,7 @@ export const LABELS_TR: AccessibilityWidgetLabels = {
   pageStructureEmpty: "Sayfada başlık bulunamadı.",
   pageStructureClose: "Kapat",
   pageStructureRefresh: "Başlık listesini yenile",
+  skipLink: "Ana içeriğe atla",
 };
 
 export const LABELS_EN: AccessibilityWidgetLabels = {
@@ -192,8 +212,10 @@ export const LABELS_EN: AccessibilityWidgetLabels = {
   toolContrast: "Contrast Mode",
   toolDarkMode: "Dark Mode",
   toolHighlightLinks: "Highlight Links",
+  toolUnderlineLinks: "Underline Links",
   toolHighlightHeadings: "Highlight Headings",
   toolReadingLine: "Reading Line",
+  toolMarkerLine: "Yellow Strip",
   toolReadingMask: "Reading Mask",
   toolLargeCursor: "Large Cursor",
   toolBlueLight: "Blue Light Filter",
@@ -204,6 +226,13 @@ export const LABELS_EN: AccessibilityWidgetLabels = {
   toolTextAlign: "Text Alignment",
   toolLetterSpacing: "Letter Spacing",
   toolPageStructure: "Page Structure",
+  toolVoiceReading: "Voice Reading",
+  voiceModeHover: "On Hover",
+  voiceModeSelection: "Read Selection",
+  voiceModeContinuous: "Read Continuously",
+  announceVoiceReadingStarted: "Voice reading started",
+  announceVoiceReadingStopped: "Voice reading stopped",
+  toolMuteSounds: "Mute Sounds",
   profileInfoToggle: "Show profile features",
   profileAdhd: "ADHD Support",
   profileDescAdhd: "Reduces distractions and helps you focus",
@@ -250,6 +279,7 @@ export const LABELS_EN: AccessibilityWidgetLabels = {
   pageStructureEmpty: "No headings found on this page.",
   pageStructureClose: "Close",
   pageStructureRefresh: "Refresh heading list",
+  skipLink: "Skip to content",
 };
 
 export const DEFAULT_LABELS: AccessibilityWidgetLabels = LABELS_TR;

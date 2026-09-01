@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 
 interface AccessibilityTriggerProps {
   label: string;
+  shortcutHint?: string;
 }
 
-export function AccessibilityTrigger({ label }: AccessibilityTriggerProps) {
+export function AccessibilityTrigger({ label, shortcutHint }: AccessibilityTriggerProps) {
   const { isPanelOpen, togglePanel } = useAccessibility();
 
   return (
@@ -24,6 +25,7 @@ export function AccessibilityTrigger({ label }: AccessibilityTriggerProps) {
       aria-haspopup="dialog"
       aria-expanded={isPanelOpen}
       aria-controls="a11y-widget-panel"
+      aria-keyshortcuts={shortcutHint}
       onClick={togglePanel}
     >
       <Accessibility className="a11y-size-7" aria-hidden="true" />

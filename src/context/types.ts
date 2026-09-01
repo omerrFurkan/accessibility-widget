@@ -9,19 +9,30 @@ export type ColorBlindnessMode =
 
 export type TextAlignMode = "none" | "left" | "center" | "right" | "justify";
 
+/** Modes for the built-in text-to-speech voice reading tool. */
+export type VoiceReadingMode = "none" | "hover" | "selection" | "continuous";
+
 export interface AccessibilitySettings {
   /** Text size multiplier. 1 = 100%. */
   fontSizeScale: number;
-  contrast: ContrastMode;
-  darkMode: boolean;
-  highlightLinks: boolean;
-  highlightHeadings: boolean;
+   contrast: ContrastMode;
+   darkMode: boolean;
+   highlightLinks: boolean;
+   /** Ege-style plain underline for every link (no background tint). */
+   underlineLinks: boolean;
+   highlightHeadings: boolean;
   /** Letter spacing step (1 = normal, 4 = wide). */
   letterSpacing: number;
+  /** Word spacing step (1 = normal, 4 = wide) — WCAG 1.4.12. */
+  wordSpacing: number;
   /** Line height step (1 = normal, 4 = generous). */
   lineHeight: number;
-  readingLine: boolean;
-  colorBlindness: ColorBlindnessMode;
+  /** Paragraph spacing step (1 = normal, 4 = generous) — WCAG 1.4.12. */
+  paragraphSpacing: number;
+   readingLine: boolean;
+   /** Ege-style yellow marker strip that follows the pointer. */
+   markerLine: boolean;
+   colorBlindness: ColorBlindnessMode;
   /** Grayscale intensity 0 = off, 4 = full. */
   grayscaleLevel: number;
   textAlign: TextAlignMode;
@@ -29,10 +40,14 @@ export interface AccessibilitySettings {
   stopAnimations: boolean;
   largeCursor: boolean;
   blueLightFilter: boolean;
-  readingMask: boolean;
-  dyslexiaFont: boolean;
-  /** Id of the active profile, null when customized or none selected. */
-  activeProfileId: string | null;
+   readingMask: boolean;
+   dyslexiaFont: boolean;
+   /** Built-in text-to-speech mode. */
+   voiceReading: VoiceReadingMode;
+   /** Mutes all audio/video elements on the host page. */
+   muteSounds: boolean;
+   /** Id of the active profile, null when customized or none selected. */
+   activeProfileId: string | null;
 }
 
 export interface AccessibilityContextValue {
@@ -49,34 +64,43 @@ export interface AccessibilityContextValue {
 
 export const DEFAULT_SETTINGS: AccessibilitySettings = {
   fontSizeScale: 1,
-  contrast: "normal",
-  darkMode: false,
-  highlightLinks: false,
-  highlightHeadings: false,
-  letterSpacing: 1,
-  lineHeight: 1,
-  readingLine: false,
-  colorBlindness: "none",
+   contrast: "normal",
+   darkMode: false,
+   highlightLinks: false,
+   underlineLinks: false,
+   highlightHeadings: false,
+    letterSpacing: 1,
+    wordSpacing: 1,
+    lineHeight: 1,
+    paragraphSpacing: 1,
+    readingLine: false,
+   markerLine: false,
+   colorBlindness: "none",
   grayscaleLevel: 0,
   textAlign: "none",
   hideImages: false,
   stopAnimations: false,
   largeCursor: false,
   blueLightFilter: false,
-  readingMask: false,
-  dyslexiaFont: false,
-  activeProfileId: null,
+   readingMask: false,
+   dyslexiaFont: false,
+   voiceReading: "none",
+   muteSounds: false,
+   activeProfileId: null,
 };
 
-export const FONT_SCALE_MIN = 0.9;
-export const FONT_SCALE_MAX = 1.6;
+export const FONT_SCALE_MIN = 1;
+export const FONT_SCALE_MAX = 2;
 export const FONT_SCALE_STEP = 0.1;
 export const SPACING_MIN = 1;
 export const SPACING_MAX = 4;
 export const GRAYSCALE_MAX = 4;
 
-/** Cycle levels for the "text zoom" tool (Metin Büyütme). */
+/** Cycle levels for the "text zoom" tool (Metin Büyütme). Growth-only:
+ *  100% → 125% → 150% → 200% → 100% (küçültme yok). */
 export const FONT_SCALE_LEVELS = [1, 1.25, 1.5, 2] as const;
+/** Cycle levels for the voice reading tool. */
+export const VOICE_READING_LEVELS = ["hover", "selection", "continuous", "none"] as const;
 /** Cycle levels for the letter-spacing / line-height tools. */
 export const SPACING_LEVELS = [1, 2, 3, 4] as const;
 /** Cycle levels for the color blindness tool. */

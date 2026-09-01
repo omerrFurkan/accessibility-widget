@@ -25,6 +25,27 @@ const COLOR_BLINDNESS_VALUES: readonly Exclude<ColorBlindnessMode, "none">[] = [
  */
 const PAUSED_MEDIA = new WeakSet<HTMLMediaElement>();
 
+/**
+ * Media elements that were NOT muted by the site itself but have been muted
+ * by the mute-sounds setting, so only these get restored when it turns off.
+ */
+const MUTED_MEDIA = new WeakSet<HTMLMediaElement>();
+
+function muteMedia(mute: boolean): void {
+  const media = Array.from(
+    document.querySelectorAll<HTMLMediaElement>("video, audio"),
+  ).filter((el) => !el.closest("[data-a11y-widget]"));
+  media.forEach((el) => {
+    if (mute && !el.muted) {
+      el.muted = true;
+      MUTED_MEDIA.add(el);
+    } else if (!mute && MUTED_MEDIA.has(el)) {
+      el.muted = false;
+      MUTED_MEDIA.delete(el);
+    }
+  });
+}
+
 function pauseMedia(stop: boolean): void {
   const media = Array.from(
     document.querySelectorAll<HTMLMediaElement>("video, audio"),
@@ -102,8 +123,16 @@ export function applySettings(settings: AccessibilitySettings): void {
     `${(settings.letterSpacing - 1) * 0.05}em`,
   );
   root.style.setProperty(
+    "--a11y-word-spacing",
+    `${(settings.wordSpacing - 1) * 0.08}em`,
+  );
+  root.style.setProperty(
     "--a11y-line-height",
     `${1.3 + (settings.lineHeight - 1) * 0.15}`,
+  );
+  root.style.setProperty(
+    "--a11y-paragraph-spacing",
+    `${(settings.paragraphSpacing - 1) * 0.5}em`,
   );
 
   // Composed page-wide filters (single filter property, stackable).
@@ -117,13 +146,17 @@ export function applySettings(settings: AccessibilitySettings): void {
   rootClasses.toggle("a11y-font-scaling", settings.fontSizeScale !== 1);
   rootClasses.toggle(
     "a11y-text-spacing",
-    settings.letterSpacing !== 1 || settings.lineHeight !== 1,
+    settings.letterSpacing !== 1 ||
+      settings.wordSpacing !== 1 ||
+      settings.lineHeight !== 1 ||
+      settings.paragraphSpacing !== 1,
   );
 
   rootClasses.toggle("a11y-dark-mode", settings.darkMode);
   rootClasses.toggle("a11y-high-contrast", settings.contrast === "high");
 
   rootClasses.toggle("a11y-links", settings.highlightLinks);
+  rootClasses.toggle("a11y-underline-links", settings.underlineLinks);
   rootClasses.toggle("a11y-headings", settings.highlightHeadings);
 
   rootClasses.toggle("a11y-hide-images", settings.hideImages);
@@ -133,10 +166,12 @@ export function applySettings(settings: AccessibilitySettings): void {
   rootClasses.toggle("a11y-text-align-justify", settings.textAlign === "justify");
 
   bodyClasses.toggle("a11y-stop-animations", settings.stopAnimations);
+  bodyClasses.toggle("a11y-marker-line", settings.markerLine);
   bodyClasses.toggle("a11y-large-cursor", settings.largeCursor);
   bodyClasses.toggle("a11y-dyslexia-font", settings.dyslexiaFont);
 
   pauseMedia(settings.stopAnimations);
+  muteMedia(settings.muteSounds);
 }
 
 export function clearSettingsEffects(): void {
@@ -145,7 +180,9 @@ export function clearSettingsEffects(): void {
 
   root.style.removeProperty("--a11y-font-scale");
   root.style.removeProperty("--a11y-letter-spacing");
+  root.style.removeProperty("--a11y-word-spacing");
   root.style.removeProperty("--a11y-line-height");
+  root.style.removeProperty("--a11y-paragraph-spacing");
 
   body.style.removeProperty("--a11y-filter");
 
@@ -155,6 +192,7 @@ export function clearSettingsEffects(): void {
     "a11y-dark-mode",
     "a11y-high-contrast",
     "a11y-links",
+    "a11y-underline-links",
     "a11y-headings",
     "a11y-hide-images",
     "a11y-text-align-left",
@@ -166,6 +204,7 @@ export function clearSettingsEffects(): void {
   body.classList.remove(
     "a11y-filtered",
     "a11y-stop-animations",
+    "a11y-marker-line",
     "a11y-large-cursor",
     "a11y-dyslexia-font",
   );
@@ -177,4 +216,6 @@ export function clearSettingsEffects(): void {
 
   // Resume any media that the stop-animations setting had paused.
   pauseMedia(false);
+  // Unmute any media that the mute-sounds setting had muted.
+  muteMedia(false);
 }

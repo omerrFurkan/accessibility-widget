@@ -12,7 +12,7 @@ import {
   DEFAULT_STORAGE_KEY,
 } from "./types";
 import type { AccessibilityContextValue, AccessibilitySettings } from "./types";
-import { loadSettings, saveSettings } from "./storage";
+import { loadSettings, normalizeSettings, saveSettings } from "./storage";
 import { applySettings, clearSettingsEffects } from "./dom-effects";
 import { findProfile } from "./profiles";
 
@@ -64,7 +64,12 @@ export function AccessibilityProvider({
     const onStorage = (event: StorageEvent) => {
       if (event.key === storageKey && event.newValue) {
         try {
-          setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(event.newValue) });
+          setSettings(
+            normalizeSettings(JSON.parse(event.newValue), {
+              ...DEFAULT_SETTINGS,
+              ...defaultSettings,
+            }),
+          );
         } catch {
           // ignore malformed payloads
         }
@@ -72,7 +77,7 @@ export function AccessibilityProvider({
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, [storageKey]);
+  }, [storageKey, defaultSettings]);
 
   const update = useCallback((partial: Partial<AccessibilitySettings>) => {
     setSettings((prev) => ({ ...prev, ...partial, activeProfileId: null }));

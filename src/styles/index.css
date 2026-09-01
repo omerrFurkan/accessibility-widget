@@ -1,8 +1,29 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,500&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   OpenDyslexic webfont - bundled locally so no external font CDN is ever
+   contacted (KVKK/GDPR + intranet-safe). Source: npm package
+   `open-dyslexic@1.0.3` (mirror of github.com/antijingoist/open-dyslexic).
+   Freely redistributable per the font's license notice ("Copying is an act
+   of love. Please copy."); based on Bitstream Vera (permissive license).
+   ========================================================================== */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("../assets/fonts/OpenDyslexic-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("../assets/fonts/OpenDyslexic-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ==========================================================================
    Accessibility Widget - styles
@@ -38,6 +59,8 @@
     --a11y-widget-border: #e5e7eb;
     --a11y-widget-muted: #f3f4f6;
     --a11y-widget-z: 2147483000;
+    /* Panel enlargement factor: 1 = normal, 1.25 = enlarged ("Paneli Büyüt"). */
+    --a11y-panel-em: 1;
     color-scheme: light;
   }
 
@@ -68,8 +91,8 @@
 
   .a11y-widget-root,
   .a11y-widget-root * {
-    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-      Roboto, Arial, sans-serif !important;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      Arial, sans-serif !important;
   }
 
   *,
@@ -104,13 +127,23 @@ html.a11y-font-scaling {
   font-size: calc(100% * var(--a11y-font-scale, 1)) !important;
 }
 
-/* --- Text spacing (letter spacing + line height) ------------------------ */
+/* --- Text spacing (WCAG 1.4.12: letter + word + line + paragraph) ------ */
 html.a11y-text-spacing
   :where(p, li, span, a, div, h1, h2, h3, h4, h5, h6, blockquote, td, th, label, dt, dd, figcaption):not(
     .a11y-widget-root *
   ) {
   letter-spacing: var(--a11y-letter-spacing, 0) !important;
+  word-spacing: var(--a11y-word-spacing, 0) !important;
   line-height: var(--a11y-line-height, 1.5) !important;
+}
+html.a11y-text-spacing
+  :where(p, li, dd, dt, blockquote, figcaption):not(.a11y-widget-root *) {
+  margin-bottom: var(--a11y-paragraph-spacing, 0) !important;
+}
+html.a11y-text-spacing
+  :where(p, li, dd, dt, blockquote, figcaption):not(.a11y-widget-root *)
+  + :where(p, li, dd, dt, blockquote, figcaption):not(.a11y-widget-root *) {
+  margin-top: var(--a11y-paragraph-spacing, 0) !important;
 }
 
 /* --- Composed page-wide filters -----------------------------------------
@@ -192,6 +225,14 @@ html.a11y-high-contrast .a11y-widget-root {
   --a11y-widget-border: #ffffff !important;
   --a11y-widget-muted: #000000 !important;
 }
+html.a11y-high-contrast .a11y-widget-root .a11y-tool-dot {
+  background: #ffffff !important;
+  opacity: 0.6;
+}
+html.a11y-high-contrast .a11y-widget-root .a11y-tool-dot.a11y-tool-dot-on {
+  background: #ffff00 !important;
+  opacity: 1;
+}
 
 /* --- Link highlighting --------------------------------------------------- */
 html.a11y-links :where(a):not(.a11y-widget-root *) {
@@ -200,6 +241,16 @@ html.a11y-links :where(a):not(.a11y-widget-root *) {
   text-underline-offset: 3px !important;
   background-color: rgba(255, 212, 0, 0.4) !important;
   box-shadow: 0 2px 0 0 rgba(255, 166, 0, 0.9) !important;
+}
+
+/* --- Underline links (Ege "Altını Çiz") ------------------------------------
+   Plain persistent underline for every link without any background tint,
+   mirroring the dedicated tool on ege.edu.tr's Engelsiz Ege bar.
+   -------------------------------------------------------------------------- */
+html.a11y-underline-links :where(a):not(.a11y-widget-root *) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 2px !important;
 }
 
 /* --- Heading highlighting ------------------------------------------------ */
@@ -284,16 +335,16 @@ body.a11y-dyslexia-font
     color-mix(in srgb, var(--a11y-widget-accent) 55%, transparent)
   );
   border-top: 2px solid var(--a11y-widget-accent);
-  z-index: var(--a11y-widget-z);
+  z-index: calc(var(--a11y-widget-z) - 1);
   transition: top 0.05s linear;
 }
 
 /* --- Reading mask ---------------------------------------------------------
-   A cursor-following spotlight: the window under the pointer stays bright,
-   everything outside it is softly darkened. Position is driven from JS via
-   left/top (mouse coordinates); the element centers itself with a
-   translate(-50%, -50%) transform.
-   -------------------------------------------------------------------------- */
+    A cursor-following spotlight: the window under the pointer stays bright,
+    everything outside it is softly darkened. Position is driven from JS via
+    left/top (mouse coordinates); the element centers itself with a
+    translate(-50%, -50%) transform.
+    -------------------------------------------------------------------------- */
 .a11y-reading-mask-el {
   position: fixed;
   left: 50%;
@@ -305,8 +356,75 @@ body.a11y-dyslexia-font
   transform: translate(-50%, -50%);
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
   pointer-events: none;
-  z-index: var(--a11y-widget-z);
+  z-index: calc(var(--a11y-widget-z) - 1);
   transition: left 0.05s linear, top 0.05s linear;
+}
+
+/* --- Marker line (Ege "Sarı Şerit") ----------------------------------------
+   Translucent yellow band following the pointer; tints content under it via
+   mix-blend-mode like ege.edu.tr. Adaptive variants mirror Ege's CSS: solid
+   multiply band in high contrast, dimmed gray in dark mode.
+   -------------------------------------------------------------------------- */
+.a11y-marker-line-el {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 1.75rem;
+  pointer-events: none;
+  background-color: #e4fd00 !important;
+  opacity: 0.75;
+  border-top: 1px solid #cde400;
+  border-bottom: 1px solid #cde400;
+  mix-blend-mode: color;
+  z-index: calc(var(--a11y-widget-z) - 1);
+  transition: top 0.05s linear;
+}
+
+html.a11y-high-contrast .a11y-marker-line-el {
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+
+html.a11y-dark-mode .a11y-marker-line-el {
+  background-color: #655b5b !important;
+  opacity: 0.25;
+  mix-blend-mode: unset;
+}
+
+/* --- Screen-reader only (live regions) --------------------------------------- */
+.a11y-widget-root .a11y-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* --- Skip link (WCAG 2.4.1) ---------------------------------------------------- */
+.a11y-skip-link {
+  position: fixed !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 2147483647 !important;
+  padding: 10px 16px !important;
+  background: var(--a11y-widget-accent, #1e3e7a) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  transform: translateY(-150%) !important;
+  transition: transform 0.15s ease !important;
+}
+.a11y-skip-link:focus,
+.a11y-skip-link:focus-visible {
+  transform: translateY(0) !important;
+  outline: 3px solid #fbbf24 !important;
+  outline-offset: 2px !important;
 }
 
 /* --- Focus visibility for the floating trigger ---------------------------- */
@@ -317,13 +435,13 @@ body.a11y-dyslexia-font
 
 /* --- Trigger position ------------------------------------------------------ */
 .a11y-widget-root .a11y-trigger {
-  bottom: 24px;
-  right: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  right: max(24px, env(safe-area-inset-right, 0px));
 }
 
 .a11y-widget-root.a11y-trigger--left .a11y-trigger {
   right: auto;
-  left: 24px;
+  left: max(24px, env(safe-area-inset-left, 0px));
 }
 
 /* ==========================================================================
@@ -341,8 +459,16 @@ body.a11y-dyslexia-font
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Enlarged mode ("Paneli Büyüt"): every hand-written panel dimension below is
+   expressed as calc(<orig>px * var(--a11y-panel-em)) so the whole panel UI
+   renders ~25% larger. The min() cap keeps the sheet inside the viewport, so
+   there is never horizontal overflow (mobile stays a full-width 100vw sheet). */
+.a11y-widget-root.a11y-panel-enlarged {
+  --a11y-panel-em: 1.25;
+}
+
 .a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel {
-  width: min(530px, 100vw);
+  width: min(calc(500px * var(--a11y-panel-em)), 100vw);
 }
 
 .a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel.a11y-panel-mobile {
@@ -364,10 +490,10 @@ body.a11y-dyslexia-font
 .a11y-widget-root .a11y-shortcut-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
+  gap: calc(4px * var(--a11y-panel-em));
+  padding: calc(2px * var(--a11y-panel-em)) calc(8px * var(--a11y-panel-em));
   border-radius: 999px;
-  font-size: 10px;
+  font-size: calc(10px * var(--a11y-panel-em));
   font-weight: 500;
   letter-spacing: 0.05em;
   background: rgba(255, 255, 255, 0.15);
@@ -412,16 +538,20 @@ body.a11y-dyslexia-font
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  height: 150px;
-  padding: 16px 10px 12px;
+  gap: calc(10px * var(--a11y-panel-em));
+  height: calc(150px * var(--a11y-panel-em));
+  min-height: calc(150px * var(--a11y-panel-em));
+  padding: calc(16px * var(--a11y-panel-em)) calc(10px * var(--a11y-panel-em))
+    calc(12px * var(--a11y-panel-em));
   border: 1.5px solid var(--a11y-widget-border);
-  border-radius: 16px;
+  border-radius: calc(16px * var(--a11y-panel-em));
   background: var(--a11y-widget-bg);
   color: var(--a11y-widget-text);
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease,
     transform 0.15s ease;
+  overflow: hidden;
+  touch-action: manipulation;
 }
 
 .a11y-widget-root .a11y-tool-button:hover {
@@ -448,9 +578,9 @@ body.a11y-dyslexia-font
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: calc(44px * var(--a11y-panel-em));
+  height: calc(44px * var(--a11y-panel-em));
+  border-radius: calc(12px * var(--a11y-panel-em));
   background: color-mix(in srgb, var(--a11y-widget-accent) 10%, #ffffff);
   color: var(--a11y-widget-accent);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -462,28 +592,35 @@ body.a11y-dyslexia-font
 }
 
 .a11y-widget-root .a11y-tool-label {
-  font-size: 12px;
+  font-size: calc(12px * var(--a11y-panel-em));
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
   color: inherit;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  max-width: 100%;
 }
 
 /* Active tools may carry a longer label (e.g. "Renk Körü Modu (Kırmızı - Yeşil)")
    that wraps over three lines; keep it inside the fixed button height. */
 .a11y-widget-root .a11y-tool-button.a11y-tool-active .a11y-tool-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--a11y-panel-em));
 }
 
 .a11y-widget-root .a11y-tool-dots {
   display: flex;
-  gap: 5px;
+  gap: calc(5px * var(--a11y-panel-em));
   margin-top: auto;
 }
 
 .a11y-widget-root .a11y-tool-dot {
-  width: 7px;
-  height: 7px;
+  width: calc(7px * var(--a11y-panel-em));
+  height: calc(7px * var(--a11y-panel-em));
   border-radius: 50%;
   background: #d1d5db;
   transition: background-color 0.2s ease;
@@ -493,19 +630,62 @@ body.a11y-dyslexia-font
   background: var(--a11y-widget-accent-2);
 }
 
-/* Enlarged panel: taller buttons, bigger icons */
-.a11y-widget-root.a11y-panel-enlarged .a11y-tool-button {
-  height: 180px;
+/* Enlarged panel: rem-based Tailwind utilities used inside the panel JSX do not
+   follow --a11y-panel-em on their own, so the few actually-used size/text
+   utilities are re-defined within the enlarged panel scope only. Scoped to
+   .a11y-widget-panel so the floating trigger and page-structure overlay are
+   never affected. !important matches the Tailwind `important: true` output so
+   these overrides win the cascade at equal origin. */
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel :is(.a11y-text-base) {
+  font-size: calc(16px * var(--a11y-panel-em)) !important;
 }
 
-.a11y-widget-root.a11y-panel-enlarged .a11y-tool-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel :is(.a11y-text-sm) {
+  font-size: calc(14px * var(--a11y-panel-em)) !important;
 }
 
-.a11y-widget-root.a11y-panel-enlarged .a11y-tool-label {
-  font-size: 13px;
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel :is(.a11y-text-xs) {
+  font-size: calc(12px * var(--a11y-panel-em)) !important;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel :is(.a11y-text-\[11px\]) {
+  font-size: calc(11px * var(--a11y-panel-em)) !important;
+}
+
+/* Tool icon glyphs live in an a11y-size-6 tile; scale with their tile.
+   (a11y-size-6 is used only by tool icons inside the panel.) */
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel :is(.a11y-size-6) {
+  width: calc(24px * var(--a11y-panel-em)) !important;
+  height: calc(24px * var(--a11y-panel-em)) !important;
+}
+
+/* Header paddings/buttons and reset button are sized by utilities in JSX;
+   re-declare them scaled here (element classes keep this targeted). */
+.a11y-widget-root.a11y-panel-enlarged .a11y-panel-header {
+  padding-top: calc(16px * var(--a11y-panel-em)) !important;
+  padding-bottom: calc(16px * var(--a11y-panel-em)) !important;
+  padding-left: calc(20px * var(--a11y-panel-em)) !important;
+  padding-right: calc(20px * var(--a11y-panel-em)) !important;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-header-lang {
+  height: calc(36px * var(--a11y-panel-em)) !important;
+  padding-left: calc(12px * var(--a11y-panel-em)) !important;
+  padding-right: calc(12px * var(--a11y-panel-em)) !important;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-header-close {
+  width: calc(36px * var(--a11y-panel-em)) !important;
+  height: calc(36px * var(--a11y-panel-em)) !important;
+}
+
+.a11y-widget-root.a11y-panel-enlarged .a11y-reset-button {
+  height: calc(48px * var(--a11y-panel-em)) !important;
+}
+
+/* Tools grid gap grows with the buttons for consistent rhythm. */
+.a11y-widget-root.a11y-panel-enlarged .a11y-widget-panel .a11y-grid {
+  gap: calc(12px * var(--a11y-panel-em)) !important;
 }
 
 .a11y-widget-root .a11y-tool-button:focus-visible,
@@ -524,7 +704,7 @@ body.a11y-dyslexia-font
 }
 
 .a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar {
-  width: 6px;
+  width: calc(6px * var(--a11y-panel-em));
 }
 
 .a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar-track {
@@ -533,7 +713,7 @@ body.a11y-dyslexia-font
 
 .a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--a11y-widget-accent) 60%, #ffffff);
-  border-radius: 3px;
+  border-radius: calc(3px * var(--a11y-panel-em));
 }
 
 /* --- Profiles list scrollbar ---------------------------------------------------- */
@@ -583,4 +763,16 @@ body.a11y-dyslexia-font
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* --- Voice reading ---------------------------------------------------------
+   Highlight for the element currently being spoken. Applied by the voice
+   reading controller (outside the widget root), so it must not be scoped
+   under .a11y-widget-root; the widget subtree is excluded via
+   [data-a11y-widget] guards in JS.
+   -------------------------------------------------------------------------- */
+.a11y-speaking {
+  outline: 3px solid var(--a11y-widget-accent, #1e3e7a) !important;
+  outline-offset: 2px !important;
+  background-color: rgba(255, 237, 160, 0.45) !important;
 }

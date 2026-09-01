@@ -32,3 +32,5 @@ export type {
   ColorBlindnessMode,
   TextAlignMode,
 } from "./context/types";
+export { createEarlyApplyScript } from "./context/early-apply";
+export type { EarlyApplyOptions } from "./context/early-apply";

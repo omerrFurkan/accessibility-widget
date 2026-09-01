@@ -18,6 +18,18 @@ describe("dom-effects", () => {
     expect(document.documentElement.classList.contains("a11y-font-scaling")).toBe(false);
   });
 
+  it("toggles the underline-links and marker-line classes (Ege parity tools)", () => {
+    applySettings(build({ underlineLinks: true, markerLine: true }));
+    expect(document.documentElement.classList.contains("a11y-underline-links")).toBe(true);
+    expect(document.body.classList.contains("a11y-marker-line")).toBe(true);
+
+    applySettings(DEFAULT_SETTINGS);
+    expect(document.documentElement.classList.contains("a11y-underline-links")).toBe(false);
+    expect(document.body.classList.contains("a11y-marker-line")).toBe(false);
+    clearSettingsEffects();
+    expect(document.body.classList.contains("a11y-marker-line")).toBe(false);
+  });
+
   it("applies the text spacing class when spacing is changed", () => {
     applySettings(build({ lineHeight: 2 }));
     expect(document.documentElement.classList.contains("a11y-text-spacing")).toBe(true);

@@ -10,11 +10,20 @@ export function ReadingMask({ active }: { active: boolean }) {
 
   useEffect(() => {
     if (!active) return;
-    const onMouseMove = (event: MouseEvent) => {
-      setPosition({ x: event.clientX, y: event.clientY });
+    const onMouseMove = (event: MouseEvent) => setPosition({ x: event.clientX, y: event.clientY });
+    const onTouchMove = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (touch) setPosition({ x: touch.clientX, y: touch.clientY });
     };
+    const onPointerMove = (event: PointerEvent) => setPosition({ x: event.clientX, y: event.clientY });
     window.addEventListener("mousemove", onMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMouseMove);
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("pointermove", onPointerMove);
+    };
   }, [active]);
 
   if (!active) return null;

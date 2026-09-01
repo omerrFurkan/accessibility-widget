@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 
 /**
- * A horizontal reading guide line that follows the pointer.
+ * Ege-style yellow marker strip: a translucent, blend-mode band that
+ * follows the pointer vertically. Unlike the reading line it tints the
+ * row under the cursor instead of drawing a solid guide.
  * Rendered as part of the widget root (fixed positioning).
  */
-export function ReadingLine({ active }: { active: boolean }) {
+export function MarkerLine({ active }: { active: boolean }) {
   const lineRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -33,5 +35,5 @@ export function ReadingLine({ active }: { active: boolean }) {
 
   if (!active) return null;
 
-  return <div ref={lineRef} className="a11y-reading-line-el" aria-hidden="true" />;
+  return <div ref={lineRef} className="a11y-marker-line-el" aria-hidden="true" />;
 }
