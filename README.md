@@ -1,43 +1,45 @@
 # @company/accessibility-widget
 
-A modern, lightweight, embeddable accessibility widget for React applications. Improves website accessibility while maintaining performance, usability and WCAG awareness.
+React uygulamaları için modern, hafif ve gömülebilir bir erişilebilirlik widget’ı. Performans ve kullanılabilirlikten ödün vermeden web sitelerinin erişilebilirliğini artırır, WCAG 2.2 AA bilinçli olarak geliştirilmiştir.
 
-- React 18+ · TypeScript · Vite (library mode)
-- TailwindCSS (prefixed `a11y-`, `!important`, no preflight so it never clashes with the host site)
-- shadcn/ui components · lucide-react icons · Context API · localStorage persistence
-- SSR-safe (Next.js compatible)
-- Inter font loaded from Google Fonts (weight 300 / 400 / 500 / 700 + 500 italic)
+- **React 18+ · TypeScript · Vite** (kütüphane modu)
+- **TailwindCSS** (`a11y-` önekli, `!important`, preflight yok — ana site stilleriyle çakışmaz)
+- **shadcn/ui · lucide-react · Context API · localStorage** kalıcılığı
+- **SSR uyumlu** (Next.js dahil)
+- **OpenDyslexic** fontu pakete gömülü — harici CDN yok, KVKK/GDPR uyumlu
 
-## Features
+## Özellikler
 
-- Text zoom cycling 100 / 115 / 130 / 150% (`--a11y-font-scale`)
-- Bidirectional text zoom %80–%200 — the scale shrinks below 100% as well as up
-- Built-in voice reading (TTS): hover, selection and continuous read-aloud modes
-- Mute sounds tool (silences audio/video elements on the page)
-- Contrast modes: High Contrast / Inverted (plus grayscale as a separate intensity control)
-- Dark mode (`.a11y-dark-mode`, invert strategy with media + widget compensation)
-- Reading tools: letter spacing, line height, reading line, yellow marker strip (pointer-following tint band, Ege "Sarı Şerit" parity), reading mask
-- Visual assist: link highlighting, plain link underlining (Ege "Altını Çiz" parity), heading highlighting, color blindness filters (protanopia, deuteranopia, tritanopia, achromatopsia), image hiding, animation pausing, large cursor, text alignment, blue-light filter
-- Enlarged-panel mode with real scaling for low-vision users
-- Bundled OpenDyslexic dyslexia font (self-hosted, no Google Fonts dependency)
-- 5 one-click accessibility profiles (low vision, color blindness, dyslexia, cognitive, screen reader)
-- Turkish (default) and English UI, toggleable at runtime and persisted
-- Customizable keyboard shortcut (default `ALT + A`; disable via `enableShortcut`)
-- Preferences persisted across sessions (localStorage), synced across tabs
+- **Metin büyütme** yalnızca büyütme: `%100 → %125 → %150 → %200 → %100` (`--a11y-font-scale`) — ilk tıklamada 1 kırmızı nokta
+- **Sesli okuma (TTS)** 3 mod: üzerine gelince / seçili metni oku / sürekli oku — klavye `focus` + dokunmatik `touchstart` destekli, `tr-TR` / `en-US` ses seçimi
+- **Sesi sustur** — sayfadaki `audio`/`video` elemanlarını susturur
+- **Kontrast modları:** Koyu / Açık / Yüksek Kontrast / Sıcak / Soğuk (`filter` kompozisyonu)
+- **Koyu mod** ve **Mavi ışık filtresi**
+- **Renk körlüğü filtreleri:** Protanopi, Deuteranopi, Tritanopi, Akromatopsi (SVG `feColorMatrix`)
+- **Gri tonlama** yoğunluk göstergeli (0–100%)
+- **Okuma araçları:** Harf aralığı + Kelime aralığı (`WCAG 1.4.12`), Satır yüksekliği + Paragraf aralığı, Okuma çizgisi, Sarı şerit (Ege “Sarı Şerit” paritesi, `mix-blend-mode`), Okuma maskesi (spotlight) — tümü `pointermove` + `touchmove` takipli
+- **Görsel destek:** Link vurgulama, Düz alt çizgi (Ege “Altını Çiz”), Başlık vurgulama, Görsel gizle, Animasyon durdur (`WeakSet` ile oynayan medyayı duraklat), Büyük imleç (48px SVG), Metin hizalama, Disleksi dostu font
+- **Sayfa yapısı** overlay — `h1–h6` toplar, odak tuzağı ile hızlı gezinme
+- **Paneli büyüt** modu (`--a11y-panel-em: 1.25`) — düşük görme için gerçek ölçek
+- **Bypass (atla) linki** `Ana içeriğe atla` — WCAG 2.4.1, klavyede odaklanınca görünür
+- **6 tek tık profil:** DEHB, Görme Desteği, Disleksi, Renk Körlüğü, Epilepsi, Yaşlılar
+- **TR (varsayılan) / EN** dil desteği, anlık değişim ve kalıcılık, `document.documentElement.lang` senkron
+- **Klavye kısayolu** varsayılan `ALT + A` (`aria-keyshortcuts` + rozet senkron), `enableShortcut` ile kapatılabilir
+- Tercihler `localStorage`’da kalıcı, sekmeler arası senkron (`storage` event), FOUC yok (`createEarlyApplyScript`)
 
-## Installation
+## Kurulum
 
 ```bash
 npm install @company/accessibility-widget
 ```
 
-Import the stylesheet once:
+Stil dosyasını bir kez içe aktarın:
 
 ```tsx
 import "@company/accessibility-widget/style.css";
 ```
 
-## Usage
+## Kullanım
 
 ```tsx
 import {
@@ -50,39 +52,37 @@ export default function App() {
     <AccessibilityProvider>
       <AccessibilityWidget
         position="bottom-right"
-        branding="Boğaziçi Üniversitesi"
+        branding={{ name: "Boğaziçi Üniversitesi", url: "https://bogazici.edu.tr" }}
       />
     </AccessibilityProvider>
   );
 }
 ```
 
-### Provider options
+### Provider seçenekleri
 
-| Prop            | Type                          | Default | Description                              |
-| --------------- | ----------------------------- | ------- | ---------------------------------------- |
-| `defaultSettings` | `Partial<AccessibilitySettings>` | —     | Settings used when nothing is persisted  |
-| `storageKey`    | `string`                      | `"@company/accessibility-widget:settings"` | localStorage key |
+| Prop | Tip | Varsayılan | Açıklama |
+|---|---|---|---|
+| `defaultSettings` | `Partial<AccessibilitySettings>` | — | Kalıcı ayar yokken kullanılacak değerler |
+| `storageKey` | `string` | `"@company/accessibility-widget:settings"` | localStorage anahtarı |
 
-### Widget options
+### Widget seçenekleri
 
-| Prop            | Type                  | Default      | Description                          |
-| --------------- | --------------------- | ------------ | ------------------------------------ |
-| `accentColor`   | `string` (hex)        | `"#1e3e7a"`  | Trigger button + panel header color  |
-| `secondaryColor`| `string` (hex)        | `"#bf141e"`  | Accent highlights (reset bar, badges) |
-| `position`      | `"bottom-right" \| "bottom-left"` | `"bottom-right"` | Floating button position |
-| `language`      | `"tr" \| "en"`        | `"tr"`       | Initial UI language (persisted across sessions) |
-| `labels`        | `Partial<AccessibilityWidgetLabels>` | Turkish defaults | Custom UI copy (overrides `language`) |
-| `branding`      | `string \| undefined` | —            | Footer text shown under the reset bar |
-| `enableShortcut`| `boolean`             | `true`       | Enable keyboard shortcut toggle (see `shortcut`) |
-| `shortcut`      | `string`              | `"Alt+A"`    | Shortcut as "+"-separated tokens (e.g. `"Ctrl+Shift+S"`); invalid values fall back to `"Alt+A"` |
-| `openParam`     | `string \| null`      | `"a11y"`     | URL query parameter controlling the panel on load (`?a11y=open\|close\|toggle`); pass `null` to disable |
+| Prop | Tip | Varsayılan | Açıklama |
+|---|---|---|---|
+| `accentColor` | `string` (hex) | `"#1e3e7a"` | Tetikleyici + panel başlık rengi |
+| `secondaryColor` | `string` (hex) | `"#bf141e"` | Nokta / aktif vurgu rengi |
+| `position` | `"bottom-right" \| "bottom-left"` | `"bottom-right"` | Kayan buton konumu |
+| `language` | `"tr" \| "en"` | `"tr"` | Başlangıç dili (kalıcı) |
+| `labels` | `Partial<AccessibilityWidgetLabels>` | Türkçe | Özel metinler (`language` üzerine yazılır) |
+| `branding` | `{name:string; url?:string}` | — | Sıfırla çubuğu altında gösterilen marka |
+| `enableShortcut` | `boolean` | `true` | Klavye kısayolunu etkinleştir |
+| `shortcut` | `string` | `"Alt+A"` | `+` ile ayrılmış kısayol, örn. `"Ctrl+Shift+S"` — geçersiz değer `Alt+A`’ya düşer |
+| `openParam` | `string \| null` | `"a11y"` | URL parametresi (`?a11y=open\|close\|toggle`), `null` ile kapat |
 
-## Integration
+## Entegrasyon
 
-### Footer link
-
-Open the widget from any host-page element, e.g. an "Erişilebilirlik" footer link:
+### Footer linki ile açma
 
 ```tsx
 <a
@@ -96,64 +96,77 @@ Open the widget from any host-page element, e.g. an "Erişilebilirlik" footer li
 </a>
 ```
 
-The global API also exposes `window.accessibilityWidget.close()` and `.toggle()`.
+Genel API: `window.accessibilityWidget.open()` / `.close()` / `.toggle()`.
 
-### URL parameter
-
-Use the `openParam` query parameter (default `a11y`) to control the panel on page load:
+### URL parametresi
 
 ```
-https://example.com/?a11y=open    # opens the panel
-https://example.com/?a11y=close   # closes the panel
-https://example.com/?a11y=toggle  # toggles the panel
+https://ornek.com/?a11y=open    # paneli aç
+https://ornek.com/?a11y=close   # paneli kapat
+https://ornek.com/?a11y=toggle  # paneli aç/kapat
 ```
 
-Any other value is ignored; rename the parameter or disable it with the `openParam` prop.
-
-### Custom shortcut
+### Özel kısayol
 
 ```tsx
 <AccessibilityWidget shortcut="Ctrl+Shift+S" />
 ```
 
-Modifiers: `Alt`, `Ctrl`, `Shift`, `Meta`/`Cmd`; the final token must be a letter A–Z or digit 0–9. Invalid strings silently fall back to `Alt+A`.
+Belirteçler: `Alt`, `Ctrl`/`Control`, `Shift`, `Meta`/`Cmd` + son tuş `A-Z` veya `0-9`.
 
-### Avoid flash of unstyled settings (SSR/MPA)
+### İlk boyamada ayarları uygula (SSR/MPA FOUC önleme)
 
-Persisted settings are normally restored after hydration. Include the early-apply script in your `<head>` to replay persisted localStorage settings before first paint:
+Kalıcı ayarlar hidratasyondan sonra geri yüklenir. İlk boyamada uygulamak için `<head>` içine erken betik ekleyin:
 
 ```tsx
 import { createEarlyApplyScript } from "@company/accessibility-widget";
 
-// Next.js App Router / any MPA <head>:
+// Next.js App Router / herhangi bir MPA <head>:
 <script dangerouslySetInnerHTML={{ __html: createEarlyApplyScript() }} />
 ```
 
-## Development
+Özel anahtar kullanıyorsanız: `createEarlyApplyScript({ storageKey: "my-key", languageKey: "my-lang" })`.
+
+## Geliştirme
 
 ```bash
 npm install
-npm run dev        # demo app (Vite playground)
-npm test           # vitest unit tests
+npm run dev        # demo uygulaması (Vite)
+npm test           # vitest birim testleri (65 test)
 npm run typecheck  # tsc --noEmit
-npm run build      # builds dist/ (ESM + CJS + .d.ts + style.css)
+npm run build      # dist/ (ESM + CJS + .d.ts + style.css) oluşturur
 ```
 
-## Project layout
+Coverage:
+
+```bash
+npm test -- --coverage  # v8 provider, text/lcov/html
+```
+
+## Proje yapısı
 
 ```
 src/
-  context/        AccessibilityProvider, settings types, storage, DOM effects
-  components/     Widget, panel, tools grid, profiles, reading mask, page-structure overlay, ui/ (shadcn)
-  hooks/          useFocusTrap
-  styles/         Tailwind + host-page effect CSS
-demo/             Vite playground app (Boğaziçi-style sample page)
+  context/        AccessibilityProvider, ayar tipleri, storage, DOM etkileri, early-apply
+  components/     Widget, panel, araç ızgarası, profiller, okuma araçları, skip-link, sesli okuma, sayfa yapısı, ui/
+  hooks/          useFocusTrap, useMediaQuery
+  styles/         Tailwind + ana sayfa etki CSS’i (a11y-* sınıfları)
+demo/             Vite demo uygulaması (Boğaziçi tarzı örnek sayfa)
+e2e/              Playwright kabul testleri
 ```
 
-## How it works
+## Nasıl çalışır
 
-The provider persists settings to `localStorage` and applies them to the document root (`<html>` / `<body>`) as `a11y-*` classes and CSS variables (`--a11y-font-scale`, `--a11y-letter-spacing`, `--a11y-line-height`). All host-page effects are defined in the shipped stylesheet, so no extra CSS is required from consumers. The widget UI renders through a portal with prefixed + `!important` Tailwind utilities, keeping it isolated from host site styles.
+Provider ayarları `localStorage`’da tutar, `<html>` / `<body>` üzerine `a11y-*` sınıfları ve CSS değişkenleri (`--a11y-font-scale`, `--a11y-letter-spacing`, `--a11y-word-spacing`, `--a11y-line-height`, `--a11y-paragraph-spacing`, `--a11y-filter`) olarak uygular. Tüm ana sayfa etkileri paketlenmiş stil dosyasında tanımlıdır, ek CSS gerekmez. Widget arayüzü `a11y-` önekli ve `!important` Tailwind yardımcılarıyla bir portal üzerinden render edilir, ana site stillerinden izole kalır ve filtrelerden etkilenmez (`body` filtresi, widget `outside <body>`).
 
-## License
+## Erişilebilirlik notları
+
+- **2.4.1 Bypass:** `Ana içeriğe atla` skip-link’i `body` başına enjekte edilir
+- **1.4.12 Metin aralığı:** harf/kelime/satır/paragraf dördü de ayarlanabilir
+- **2.4.7 Odak görünürlüğü:** sarı `outline` (`#fbbf24`), odak tuzağı `Tab` sarma, `inert` + `aria-hidden` filtresi
+- **4.1.3 Durum mesajları:** `aria-live="polite" role="status" aria-atomic` ile profil/dil/sıfırla anonsu
+- **2.5.8 Hedef boyutu:** profil bilgi butonu `24px` (AA)
+
+## Lisans
 
 MIT
