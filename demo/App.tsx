@@ -4,9 +4,9 @@ export default function App() {
       <header className="demo-header">
         <div className="demo-container demo-header-inner">
           <div className="demo-logo">
-            <span className="demo-logo-mark">BÜ</span>
+            <span className="demo-logo-mark">YİÜ</span>
             <div>
-              <strong>BOĞAZİÇİ</strong>
+              <strong>YÜKSEK İHTİSAS</strong>
               <small>ÜNİVERSİTESİ</small>
             </div>
           </div>
@@ -22,7 +22,7 @@ export default function App() {
       <main className="demo-main">
         <section className="demo-hero">
           <div className="demo-container">
-            <h1>Boğaziçi Üniversitesi</h1>
+            <h1>Yüksek İhtisas Üniversitesi</h1>
             <p>
               1863&apos;ten bu yana bilim, eğitim ve araştırmada öncü bir kurum.
               Bu sayfa, erişilebilirlik widget&apos;ının etkilerini test etmek için
@@ -43,7 +43,7 @@ export default function App() {
               <article className="demo-card">
                 <h3>Tarihçe</h3>
                 <p>
-                  Boğaziçi Üniversitesi, köklü geçmişiyle Türkiye&apos;nin önde
+                  Yüksek İhtisas Üniversitesi, köklü geçmişiyle Türkiye&apos;nin önde
                   gelen yükseköğretim kurumlarından biridir. Kampüsleri İstanbul&apos;un
                   Avrupa yakasında yer alır. Daha fazla bilgi için{" "}
                   <a href="#tarihce">tarihçe sayfamızı</a> ziyaret edin.
@@ -116,8 +116,8 @@ export default function App() {
         <div className="demo-container">
           <p>
             Demo sayfası —{" "}
-            <a href="https://bogazici.edu.tr" target="_blank" rel="noreferrer">
-              bogazici.edu.tr
+            <a href="https://yiu.edu.tr" target="_blank" rel="noreferrer">
+              yiu.edu.tr
             </a>{" "}
             referans alınarak oluşturuldu. Widget: @company/accessibility-widget
           </p>

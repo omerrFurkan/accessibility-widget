@@ -250,7 +250,7 @@ test.describe("Sesli okuma (TTS)", () => {
       )
       .toBeGreaterThan(0);
     const spoken: string[] = await page.evaluate(() => (window as any).__a11ySpoken);
-    expect(spoken[0]).toContain("Boğaziçi Üniversitesi");
+    expect(spoken[0]).toContain("Yüksek İhtisas Üniversitesi");
   });
 
   test("seçim modu: metin seçilince okur", async ({ page }) => {

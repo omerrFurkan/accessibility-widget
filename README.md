@@ -52,7 +52,7 @@ export default function App() {
     <AccessibilityProvider>
       <AccessibilityWidget
         position="bottom-right"
-        branding={{ name: "Boğaziçi Üniversitesi", url: "https://bogazici.edu.tr" }}
+        branding={{ name: "Yüksek İhtisas Üniversitesi", url: "https://yiu.edu.tr" }}
       />
     </AccessibilityProvider>
   );
@@ -151,7 +151,7 @@ src/
   components/     Widget, panel, araç ızgarası, profiller, okuma araçları, skip-link, sesli okuma, sayfa yapısı, ui/
   hooks/          useFocusTrap, useMediaQuery
   styles/         Tailwind + ana sayfa etki CSS’i (a11y-* sınıfları)
-demo/             Vite demo uygulaması (Boğaziçi tarzı örnek sayfa)
+demo/             Vite demo uygulaması (Yüksek İhtisas tarzı örnek sayfa)
 e2e/              Playwright kabul testleri
 ```
 
