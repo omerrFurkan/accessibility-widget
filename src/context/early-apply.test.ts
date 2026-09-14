@@ -163,7 +163,6 @@ describe("createEarlyApplyScript", () => {
     expect(earlyBodyStyle).toBe(document.body.getAttribute("style"));
     expect(earlyBodyStyle).toContain("invert(1) hue-rotate(180deg) grayscale(0.5)");
     expect(earlyBodyStyle).toContain("sepia(0.4)");
-    expect(earlyBodyStyle).toContain("sepia(0.25) hue-rotate(-12deg) saturate(1.15)");
     expect(earlyBodyStyle).toContain("url(#a11y-cb-deuteranopia)");
   });
 });

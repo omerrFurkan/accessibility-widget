@@ -17,7 +17,7 @@ import { ACCESSIBILITY_PROFILES, findProfile } from "@/context/profiles";
 import type { AccessibilityWidgetLabels } from "./labels";
 import { cn } from "@/lib/utils";
 
-const PROFILE_ICONS: Record<string, LucideIcon> = {
+export const PROFILE_ICONS: Record<string, LucideIcon> = {
   adhd: Brain,
   "low-vision": Eye,
   dyslexia: BookOpen,

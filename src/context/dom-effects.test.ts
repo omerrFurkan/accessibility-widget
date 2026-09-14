@@ -18,16 +18,14 @@ describe("dom-effects", () => {
     expect(document.documentElement.classList.contains("a11y-font-scaling")).toBe(false);
   });
 
-  it("toggles the underline-links and marker-line classes (Ege parity tools)", () => {
-    applySettings(build({ underlineLinks: true, markerLine: true }));
+  it("toggles the underline-links class", () => {
+    applySettings(build({ underlineLinks: true }));
     expect(document.documentElement.classList.contains("a11y-underline-links")).toBe(true);
-    expect(document.body.classList.contains("a11y-marker-line")).toBe(true);
 
     applySettings(DEFAULT_SETTINGS);
     expect(document.documentElement.classList.contains("a11y-underline-links")).toBe(false);
-    expect(document.body.classList.contains("a11y-marker-line")).toBe(false);
     clearSettingsEffects();
-    expect(document.body.classList.contains("a11y-marker-line")).toBe(false);
+    expect(document.documentElement.classList.contains("a11y-underline-links")).toBe(false);
   });
 
   it("applies the text spacing class when spacing is changed", () => {
@@ -63,28 +61,23 @@ describe("dom-effects", () => {
     expect(document.documentElement.classList.contains("a11y-high-contrast")).toBe(true);
     applySettings(build({ contrast: "warm" }));
     expect(document.documentElement.classList.contains("a11y-high-contrast")).toBe(false);
+    expect(document.documentElement.classList.contains("a11y-contrast-warm")).toBe(true);
     applySettings(DEFAULT_SETTINGS);
     expect(document.documentElement.classList.contains("a11y-high-contrast")).toBe(false);
+    expect(document.documentElement.classList.contains("a11y-contrast-warm")).toBe(false);
   });
 
-  it("applies the filter-based contrast modes through the body filter", () => {
-    applySettings(build({ contrast: "dark" }));
-    expect(document.body.classList.contains("a11y-filtered")).toBe(true);
-    expect(document.body.style.getPropertyValue("--a11y-filter")).toBe(
-      "invert(1) hue-rotate(180deg) contrast(1.05)",
-    );
-    applySettings(build({ contrast: "light" }));
-    expect(document.body.style.getPropertyValue("--a11y-filter")).toBe(
-      "brightness(1.08) contrast(1.02)",
-    );
-    applySettings(build({ contrast: "warm" }));
-    expect(document.body.style.getPropertyValue("--a11y-filter")).toBe(
-      "sepia(0.25) hue-rotate(-12deg) saturate(1.15)",
-    );
-    applySettings(build({ contrast: "cold" }));
-    expect(document.body.style.getPropertyValue("--a11y-filter")).toBe(
-      "hue-rotate(12deg) saturate(1.05)",
-    );
+  it("applies the palette-based contrast modes as classes, not filters", () => {
+    const modes = ["dark", "light", "warm", "cold"] as const;
+    for (const mode of modes) {
+      applySettings(build({ contrast: mode }));
+      expect(document.documentElement.classList.contains(`a11y-contrast-${mode}`)).toBe(true);
+      for (const other of modes.filter((m) => m !== mode)) {
+        expect(document.documentElement.classList.contains(`a11y-contrast-${other}`)).toBe(false);
+      }
+      expect(document.body.classList.contains("a11y-filtered")).toBe(false);
+      expect(document.body.style.getPropertyValue("--a11y-filter")).toBe("none");
+    }
     applySettings(build({ contrast: "high" }));
     expect(document.body.classList.contains("a11y-filtered")).toBe(false);
     expect(document.body.style.getPropertyValue("--a11y-filter")).toBe("none");

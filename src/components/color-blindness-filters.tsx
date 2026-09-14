@@ -6,7 +6,8 @@ const MATRICES = {
 } as const;
 
 /**
- * Hidden SVG definitions referenced by the `body.a11y-cb-*` CSS filters.
+ * Hidden SVG definitions referenced by the composed `--a11y-filter`
+ * (`url(#a11y-cb-*)`) on the page body and the widget root.
  */
 export function ColorBlindnessFilters() {
   return (

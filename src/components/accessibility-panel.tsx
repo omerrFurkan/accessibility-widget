@@ -122,34 +122,36 @@ export function AccessibilityPanel({
 
       <div className="a11y-panel-scroll a11y-flex-1 a11y-overflow-y-auto a11y-px-4 a11y-py-4">
         <div className="a11y-panel-anim a11y-flex a11y-flex-col a11y-gap-4">
-          <ProfilesSection
-            labels={labels}
-            open={profilesOpen}
-            onToggle={() => setProfilesOpen((open) => !open)}
-          />
-
-          <div className="a11y-flex a11y-items-center a11y-justify-between a11y-gap-3 a11y-rounded-xl a11y-border a11y-border-[var(--a11y-widget-border)] a11y-bg-[var(--a11y-widget-muted)]/60 a11y-px-4 a11y-py-3">
-            <span className="a11y-flex a11y-items-center a11y-gap-2.5">
-              {enlarged ? (
-                <Minimize2
-                  className="a11y-size-4 a11y-text-[var(--a11y-widget-accent)]"
-                  aria-hidden="true"
-                />
-              ) : (
-                <Maximize2
-                  className="a11y-size-4 a11y-text-[var(--a11y-widget-accent)]"
-                  aria-hidden="true"
-                />
-              )}
-              <span className="a11y-text-sm a11y-font-medium">
-                {enlarged ? labels.shrinkPanel : labels.enlargePanel}
-              </span>
-            </span>
-            <Switch
-              checked={enlarged}
-              onCheckedChange={onToggleEnlarged}
-              aria-label={enlarged ? labels.shrinkPanel : labels.enlargePanel}
+          <div className="a11y-panel-pinned a11y-flex a11y-flex-col a11y-gap-4">
+            <ProfilesSection
+              labels={labels}
+              open={profilesOpen}
+              onToggle={() => setProfilesOpen((open) => !open)}
             />
+
+            <div className="a11y-flex a11y-items-center a11y-justify-between a11y-gap-3 a11y-rounded-xl a11y-border a11y-border-[var(--a11y-widget-border)] a11y-bg-[var(--a11y-widget-muted)]/60 a11y-px-4 a11y-py-3">
+              <span className="a11y-flex a11y-items-center a11y-gap-2.5">
+                {enlarged ? (
+                  <Minimize2
+                    className="a11y-size-4 a11y-text-[var(--a11y-widget-accent)]"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Maximize2
+                    className="a11y-size-4 a11y-text-[var(--a11y-widget-accent)]"
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="a11y-text-sm a11y-font-medium">
+                  {enlarged ? labels.shrinkPanel : labels.enlargePanel}
+                </span>
+              </span>
+              <Switch
+                checked={enlarged}
+                onCheckedChange={onToggleEnlarged}
+                aria-label={enlarged ? labels.shrinkPanel : labels.enlargePanel}
+              />
+            </div>
           </div>
 
           <ToolsGrid

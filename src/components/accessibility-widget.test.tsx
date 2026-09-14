@@ -225,6 +225,30 @@ describe("AccessibilityWidget", () => {
     expect(document.querySelector(".a11y-reading-mask-el")).toBeNull();
   });
 
+  it("toggles the reading guide bar and follows the mouse", async () => {
+    const user = userEvent.setup();
+    render(
+      <AccessibilityProvider storageKey={KEY}>
+        <AccessibilityWidget />
+      </AccessibilityProvider>,
+    );
+    const page = documentQueries();
+    await user.click(page.getByRole("button", { name: "Erişilebilirlik ayarları" }));
+    await user.click(page.getByRole("button", { name: "Okuma Yardım Çubuğu" }));
+
+    const guide = document.querySelector<HTMLElement>(".a11y-reading-guide-el");
+    expect(guide).not.toBeNull();
+
+    act(() => {
+      window.dispatchEvent(new MouseEvent("mousemove", { clientX: 200, clientY: 300 }));
+    });
+    expect(guide!.style.left).toBe("200px");
+    expect(guide!.style.top).toBe("300px");
+
+    await user.click(page.getByRole("button", { name: "Okuma Yardım Çubuğu" }));
+    expect(document.querySelector(".a11y-reading-guide-el")).toBeNull();
+  });
+
   it("grays the widget UI when grayscale is enabled", async () => {
     const user = userEvent.setup();
     render(
@@ -492,7 +516,7 @@ describe("AccessibilityWidget", () => {
     expect(within(profilesList).getAllByRole("listitem")).toHaveLength(6);
   });
 
-  it("adds the mobile full-width class when the viewport is narrow", async () => {
+  it("renders the mobile menu instead of the panel when the viewport is narrow", async () => {
     const user = userEvent.setup();
     const matchMediaSpy = vi
       .spyOn(window, "matchMedia")
@@ -515,8 +539,11 @@ describe("AccessibilityWidget", () => {
     const page = documentQueries();
     await user.click(page.getByRole("button", { name: "Erişilebilirlik ayarları" }));
 
-    const panel = page.getByRole("dialog", { name: "Erişilebilirlik Seçenekleri" });
-    expect(panel).toHaveClass("a11y-panel-mobile");
+    const menu = page.getByRole("dialog", { name: "Erişilebilirlik Aracı" });
+    expect(menu).toHaveClass("a11y-mobile-menu");
+    expect(
+      page.queryByRole("dialog", { name: "Erişilebilirlik Seçenekleri" }),
+    ).not.toBeInTheDocument();
 
     matchMediaSpy.mockRestore();
   });

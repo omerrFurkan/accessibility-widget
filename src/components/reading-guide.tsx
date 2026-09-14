@@ -1,28 +1,27 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Ege-style yellow marker strip: a translucent, blend-mode band that
- * follows the pointer vertically. Unlike the reading line it tints the
- * row under the cursor instead of drawing a solid guide.
+ * A compact floating guide bar that follows the pointer on both axes,
+ * with a centered upward triangle (----------^---------).
  * Rendered as part of the widget root (fixed positioning).
  */
-export function MarkerLine({ active }: { active: boolean }) {
-  const lineRef = useRef<HTMLDivElement | null>(null);
+export function ReadingGuide({ active }: { active: boolean }) {
+  const barRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!active) return;
-    const onMove = (clientY: number) => {
-      const el = lineRef.current;
+    const onMove = (clientX: number, clientY: number) => {
+      const el = barRef.current;
       if (!el) return;
-      const y = Math.max(0, clientY - el.offsetHeight / 2);
-      el.style.top = `${y}px`;
+      el.style.left = `${clientX}px`;
+      el.style.top = `${clientY}px`;
     };
-    const onMouseMove = (event: MouseEvent) => onMove(event.clientY);
+    const onMouseMove = (event: MouseEvent) => onMove(event.clientX, event.clientY);
     const onTouchMove = (event: TouchEvent) => {
       const touch = event.touches[0];
-      if (touch) onMove(touch.clientY);
+      if (touch) onMove(touch.clientX, touch.clientY);
     };
-    const onPointerMove = (event: PointerEvent) => onMove(event.clientY);
+    const onPointerMove = (event: PointerEvent) => onMove(event.clientX, event.clientY);
     window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -35,5 +34,5 @@ export function MarkerLine({ active }: { active: boolean }) {
 
   if (!active) return null;
 
-  return <div ref={lineRef} className="a11y-marker-line-el" aria-hidden="true" />;
+  return <div ref={barRef} className="a11y-reading-guide-el" aria-hidden="true" />;
 }

@@ -13,14 +13,15 @@ React uygulamaları için modern, hafif ve gömülebilir bir erişilebilirlik wi
 - **Metin büyütme** yalnızca büyütme: `%100 → %125 → %150 → %200 → %100` (`--a11y-font-scale`) — ilk tıklamada 1 kırmızı nokta
 - **Sesli okuma (TTS)** 3 mod: üzerine gelince / seçili metni oku / sürekli oku — klavye `focus` + dokunmatik `touchstart` destekli, `tr-TR` / `en-US` ses seçimi
 - **Sesi sustur** — sayfadaki `audio`/`video` elemanlarını susturur
-- **Kontrast modları:** Koyu / Açık / Yüksek Kontrast / Sıcak / Soğuk (`filter` kompozisyonu)
+- **Kontrast modları:** Koyu / Açık / Yüksek Kontrast / Sıcak / Soğuk (WCAG 2.2 AA ≥4.5:1 paletler, high AAA ≥7:1)
 - **Koyu mod** ve **Mavi ışık filtresi**
 - **Renk körlüğü filtreleri:** Protanopi, Deuteranopi, Tritanopi, Akromatopsi (SVG `feColorMatrix`)
-- **Gri tonlama** yoğunluk göstergeli (0–100%)
-- **Okuma araçları:** Harf aralığı + Kelime aralığı (`WCAG 1.4.12`), Satır yüksekliği + Paragraf aralığı, Okuma çizgisi, Sarı şerit (Ege “Sarı Şerit” paritesi, `mix-blend-mode`), Okuma maskesi (spotlight) — tümü `pointermove` + `touchmove` takipli
+- **Gri tonlama** tek dokunuşla aç/kapat (noktasız binary buton)
+- **Okuma araçları:** Harf aralığı + Kelime aralığı (`WCAG 1.4.12`), Satır yüksekliği + Paragraf aralığı, Okuma çizgisi, Yardım çubuğu (imleci iki eksende takip eden `^` göstergeli bar), Okuma maskesi (spotlight) — tümü `pointermove` + `touchmove` takipli
 - **Görsel destek:** Link vurgulama, Düz alt çizgi (Ege “Altını Çiz”), Başlık vurgulama, Görsel gizle, Animasyon durdur (`WeakSet` ile oynayan medyayı duraklat), Büyük imleç (48px SVG), Metin hizalama, Disleksi dostu font
 - **Sayfa yapısı** overlay — `h1–h6` toplar, odak tuzağı ile hızlı gezinme
 - **Paneli büyüt** modu (`--a11y-panel-em: 1.25`) — düşük görme için gerçek ölçek
+- **Mobil menü** (≤640px): iki görünümlü — profil kartı ("Erişilebilirlik Aracı") + "İçerik Ayarları" kartı (etiketli araç listesi) + tüm araçların ikon rafı; lacivert barda kapat/sıfırla/geri
 - **Bypass (atla) linki** `Ana içeriğe atla` — WCAG 2.4.1, klavyede odaklanınca görünür
 - **6 tek tık profil:** DEHB, Görme Desteği, Disleksi, Renk Körlüğü, Epilepsi, Yaşlılar
 - **TR (varsayılan) / EN** dil desteği, anlık değişim ve kalıcılık, `document.documentElement.lang` senkron
@@ -132,7 +133,7 @@ import { createEarlyApplyScript } from "@company/accessibility-widget";
 ```bash
 npm install
 npm run dev        # demo uygulaması (Vite)
-npm test           # vitest birim testleri (65 test)
+npm test           # vitest birim testleri (94 test)
 npm run typecheck  # tsc --noEmit
 npm run build      # dist/ (ESM + CJS + .d.ts + style.css) oluşturur
 ```
@@ -147,8 +148,8 @@ npm test -- --coverage  # v8 provider, text/lcov/html
 
 ```
 src/
-  context/        AccessibilityProvider, ayar tipleri, storage, DOM etkileri, early-apply
-  components/     Widget, panel, araç ızgarası, profiller, okuma araçları, skip-link, sesli okuma, sayfa yapısı, ui/
+  context/        AccessibilityProvider, ayar tipleri, storage, DOM etkileri, early-apply, kontrast paletleri
+  components/     Widget, panel, mobil menü, araç ızgarası (useTools), profiller, okuma araçları, skip-link, sesli okuma, sayfa yapısı, ui/
   hooks/          useFocusTrap, useMediaQuery
   styles/         Tailwind + ana sayfa etki CSS’i (a11y-* sınıfları)
 demo/             Vite demo uygulaması (Yüksek İhtisas tarzı örnek sayfa)
@@ -157,7 +158,7 @@ e2e/              Playwright kabul testleri
 
 ## Nasıl çalışır
 
-Provider ayarları `localStorage`’da tutar, `<html>` / `<body>` üzerine `a11y-*` sınıfları ve CSS değişkenleri (`--a11y-font-scale`, `--a11y-letter-spacing`, `--a11y-word-spacing`, `--a11y-line-height`, `--a11y-paragraph-spacing`, `--a11y-filter`) olarak uygular. Tüm ana sayfa etkileri paketlenmiş stil dosyasında tanımlıdır, ek CSS gerekmez. Widget arayüzü `a11y-` önekli ve `!important` Tailwind yardımcılarıyla bir portal üzerinden render edilir, ana site stillerinden izole kalır ve filtrelerden etkilenmez (`body` filtresi, widget `outside <body>`).
+Provider ayarları `localStorage`’da tutar, `<html>` / `<body>` üzerine `a11y-*` sınıfları ve CSS değişkenleri (`--a11y-font-scale`, `--a11y-letter-spacing`, `--a11y-word-spacing`, `--a11y-line-height`, `--a11y-paragraph-spacing`, `--a11y-filter`) olarak uygular. Kontrast modları class-tabanlı WCAG paletleridir; koyu mod / gri tonlama / mavi ışık / renk körlüğü filtreleri `body` üzerinde birleşir ve panelde aynalanır. Tüm ana sayfa etkileri paketlenmiş stil dosyasında tanımlıdır, ek CSS gerekmez. Widget arayüzü `a11y-` önekli ve `!important` Tailwind yardımcılarıyla bir portal üzerinden (`<body>` dışında) render edilir, ana site stilleriyle çakışmaz; içerik-sınıfı modlar (link/başlık vurgulama, metin aralığı vb.) paneli etkilemez.
 
 ## Erişilebilirlik notları
 

@@ -1,16 +1,8 @@
-import type { AccessibilitySettings, ColorBlindnessMode, ContrastMode } from "./types";
+import type { AccessibilitySettings, ColorBlindnessMode } from "./types";
 
 export const FILTER_NONE = "none";
 const INVERT_FILTER = "invert(1) hue-rotate(180deg)";
 const BLUE_LIGHT_FILTER = "sepia(0.4) hue-rotate(-8deg) saturate(0.85) brightness(1.03)";
-
-/** Contrast modes expressed as page-wide color filters. */
-const CONTRAST_FILTERS: Record<Exclude<ContrastMode, "normal" | "high">, string> = {
-  dark: "invert(1) hue-rotate(180deg) contrast(1.05)",
-  light: "brightness(1.08) contrast(1.02)",
-  warm: "sepia(0.25) hue-rotate(-12deg) saturate(1.15)",
-  cold: "hue-rotate(12deg) saturate(1.05)",
-};
 
 const COLOR_BLINDNESS_VALUES: readonly Exclude<ColorBlindnessMode, "none">[] = [
   "protanopia",
@@ -73,6 +65,9 @@ function classList(root: HTMLElement): DOMTokenList {
 
 /**
  * Builds the composed, stackable filter list for the given settings.
+ * Contrast modes are class-based palettes (WCAG ratios, see
+ * contrast-palettes.ts) and intentionally NOT part of this list —
+ * only dark mode, grayscale, blue light and color blindness stack here.
  * The list is built WITHOUT "none" entries: `none` is only valid as the
  * whole filter value, and a bare `none` inside a filter function list
  * makes the entire declaration invalid at computed-value time in real
@@ -82,12 +77,7 @@ function classList(root: HTMLElement): DOMTokenList {
  * overlay that dims the page around a cursor-following window.
  */
 export function composeFilter(settings: AccessibilitySettings): string {
-  const invert =
-    settings.darkMode || settings.contrast === "dark"
-      ? settings.contrast === "dark"
-        ? CONTRAST_FILTERS.dark
-        : INVERT_FILTER
-      : FILTER_NONE;
+  const invert = settings.darkMode ? INVERT_FILTER : FILTER_NONE;
   const grayscale =
     settings.grayscaleLevel > 0
       ? `grayscale(${settings.grayscaleLevel * 0.25})`
@@ -97,15 +87,9 @@ export function composeFilter(settings: AccessibilitySettings): string {
     settings.colorBlindness === "none"
       ? FILTER_NONE
       : `url(#a11y-cb-${settings.colorBlindness})`;
-  const contrastTemp =
-    settings.contrast === "warm" ||
-    settings.contrast === "cold" ||
-    settings.contrast === "light"
-      ? CONTRAST_FILTERS[settings.contrast]
-      : FILTER_NONE;
 
   return (
-    [invert, grayscale, blueLight, cbFilter, contrastTemp]
+    [invert, grayscale, blueLight, cbFilter]
       .filter((value) => value !== FILTER_NONE)
       .join(" ") || FILTER_NONE
   );
@@ -154,6 +138,10 @@ export function applySettings(settings: AccessibilitySettings): void {
 
   rootClasses.toggle("a11y-dark-mode", settings.darkMode);
   rootClasses.toggle("a11y-high-contrast", settings.contrast === "high");
+  rootClasses.toggle("a11y-contrast-dark", settings.contrast === "dark");
+  rootClasses.toggle("a11y-contrast-light", settings.contrast === "light");
+  rootClasses.toggle("a11y-contrast-warm", settings.contrast === "warm");
+  rootClasses.toggle("a11y-contrast-cold", settings.contrast === "cold");
 
   rootClasses.toggle("a11y-links", settings.highlightLinks);
   rootClasses.toggle("a11y-underline-links", settings.underlineLinks);
@@ -166,7 +154,6 @@ export function applySettings(settings: AccessibilitySettings): void {
   rootClasses.toggle("a11y-text-align-justify", settings.textAlign === "justify");
 
   bodyClasses.toggle("a11y-stop-animations", settings.stopAnimations);
-  bodyClasses.toggle("a11y-marker-line", settings.markerLine);
   bodyClasses.toggle("a11y-large-cursor", settings.largeCursor);
   bodyClasses.toggle("a11y-dyslexia-font", settings.dyslexiaFont);
 
@@ -191,6 +178,10 @@ export function clearSettingsEffects(): void {
     "a11y-text-spacing",
     "a11y-dark-mode",
     "a11y-high-contrast",
+    "a11y-contrast-dark",
+    "a11y-contrast-light",
+    "a11y-contrast-warm",
+    "a11y-contrast-cold",
     "a11y-links",
     "a11y-underline-links",
     "a11y-headings",
@@ -204,7 +195,6 @@ export function clearSettingsEffects(): void {
   body.classList.remove(
     "a11y-filtered",
     "a11y-stop-animations",
-    "a11y-marker-line",
     "a11y-large-cursor",
     "a11y-dyslexia-font",
   );

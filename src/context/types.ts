@@ -30,8 +30,8 @@ export interface AccessibilitySettings {
   /** Paragraph spacing step (1 = normal, 4 = generous) — WCAG 1.4.12. */
   paragraphSpacing: number;
    readingLine: boolean;
-   /** Ege-style yellow marker strip that follows the pointer. */
-   markerLine: boolean;
+   /** Slim pointer-following guide bar with a centered triangle. */
+   readingGuide: boolean;
    colorBlindness: ColorBlindnessMode;
   /** Grayscale intensity 0 = off, 4 = full. */
   grayscaleLevel: number;
@@ -74,7 +74,7 @@ export const DEFAULT_SETTINGS: AccessibilitySettings = {
     lineHeight: 1,
     paragraphSpacing: 1,
     readingLine: false,
-   markerLine: false,
+    readingGuide: false,
    colorBlindness: "none",
   grayscaleLevel: 0,
   textAlign: "none",

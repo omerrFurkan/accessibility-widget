@@ -6,10 +6,12 @@ import { composeFilter, FILTER_NONE } from "@/context/dom-effects";
 import { findProfile } from "@/context/profiles";
 import { DEFAULT_LANGUAGE_KEY } from "@/context/types";
 import { loadLanguage, saveLanguage } from "@/context/storage";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { AccessibilityTrigger } from "./accessibility-trigger";
 import { AccessibilityPanel } from "./accessibility-panel";
+import { MobileMenu } from "./mobile-menu";
 import { ReadingLine } from "./reading-line";
-import { MarkerLine } from "./marker-line";
+import { ReadingGuide } from "./reading-guide";
 import { ReadingMask } from "./reading-mask";
 import { ColorBlindnessFilters } from "./color-blindness-filters";
 import { VoiceReadingController } from "./voice-reading";
@@ -153,6 +155,7 @@ export function AccessibilityWidget({
   const [enlarged, setEnlarged] = useState(false);
   const [pageStructureOpen, setPageStructureOpen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     saveLanguage(DEFAULT_LANGUAGE_KEY, language);
@@ -285,7 +288,7 @@ export function AccessibilityWidget({
         }}
       >
         <ReadingLine active={settings.readingLine} />
-        <MarkerLine active={settings.markerLine} />
+        <ReadingGuide active={settings.readingGuide} />
       <ReadingMask active={settings.readingMask} />
       <div
         className="a11y-pointer-events-auto"
@@ -301,25 +304,40 @@ export function AccessibilityWidget({
           ? ({ inert: "" } as HTMLAttributes<HTMLDivElement>)
           : {})}
       >
-        <AccessibilityPanel
-          labels={labels}
-          language={language}
-          onToggleLanguage={() => {
-            setLanguage((current) => (current === "tr" ? "en" : "tr"));
-            setAnnouncement(labels.announceLanguageChanged);
-          }}
-          onAnnounce={setAnnouncement}
-          branding={branding}
-          enlarged={enlarged}
-          onToggleEnlarged={() => setEnlarged((value) => !value)}
-          pageStructureOpen={pageStructureOpen}
-          onOpenPageStructure={() => setPageStructureOpen(true)}
-          inert={pageStructureOpen}
-          shortcutHint={shortcut
-            .split("+")
-            .map((s) => s.trim().toUpperCase())
-            .join(" + ")}
-        />
+        {isMobile ? (
+          <MobileMenu
+            labels={labels}
+            language={language}
+            onToggleLanguage={() => {
+              setLanguage((current) => (current === "tr" ? "en" : "tr"));
+              setAnnouncement(labels.announceLanguageChanged);
+            }}
+            onAnnounce={setAnnouncement}
+            pageStructureOpen={pageStructureOpen}
+            onOpenPageStructure={() => setPageStructureOpen(true)}
+            inert={pageStructureOpen}
+          />
+        ) : (
+          <AccessibilityPanel
+            labels={labels}
+            language={language}
+            onToggleLanguage={() => {
+              setLanguage((current) => (current === "tr" ? "en" : "tr"));
+              setAnnouncement(labels.announceLanguageChanged);
+            }}
+            onAnnounce={setAnnouncement}
+            branding={branding}
+            enlarged={enlarged}
+            onToggleEnlarged={() => setEnlarged((value) => !value)}
+            pageStructureOpen={pageStructureOpen}
+            onOpenPageStructure={() => setPageStructureOpen(true)}
+            inert={pageStructureOpen}
+            shortcutHint={shortcut
+              .split("+")
+              .map((s) => s.trim().toUpperCase())
+              .join(" + ")}
+          />
+        )}
       </div>
       <div className="a11y-pointer-events-auto">
         <PageStructureOverlay

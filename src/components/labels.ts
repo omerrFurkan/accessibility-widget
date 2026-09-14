@@ -27,7 +27,7 @@ export interface AccessibilityWidgetLabels {
    toolUnderlineLinks: string;
    toolHighlightHeadings: string;
    toolReadingLine: string;
-   toolMarkerLine: string;
+   toolReadingGuide: string;
    toolReadingMask: string;
   toolLargeCursor: string;
   toolBlueLight: string;
@@ -92,6 +92,10 @@ export interface AccessibilityWidgetLabels {
   pageStructureClose: string;
   pageStructureRefresh: string;
   skipLink: string;
+  mobileTitle: string;
+  mobileTools: string;
+  backToProfiles: string;
+  contentSettings: string;
 }
 
 export const LABELS_TR: AccessibilityWidgetLabels = {
@@ -121,7 +125,7 @@ export const LABELS_TR: AccessibilityWidgetLabels = {
   toolUnderlineLinks: "Linkleri Altına Çiz",
   toolHighlightHeadings: "Başlıkları Vurgula",
   toolReadingLine: "Okuma Çizgisi",
-  toolMarkerLine: "Sarı Şerit",
+  toolReadingGuide: "Okuma Yardım Çubuğu",
   toolReadingMask: "Okuma Maskesi",
   toolLargeCursor: "Büyük İmleç",
   toolBlueLight: "Mavi Işık Filtresi",
@@ -186,6 +190,10 @@ export const LABELS_TR: AccessibilityWidgetLabels = {
   pageStructureClose: "Kapat",
   pageStructureRefresh: "Başlık listesini yenile",
   skipLink: "Ana içeriğe atla",
+  mobileTitle: "Erişilebilirlik Aracı",
+  mobileTools: "Araçlar",
+  backToProfiles: "Profillere dön",
+  contentSettings: "İçerik Ayarları",
 };
 
 export const LABELS_EN: AccessibilityWidgetLabels = {
@@ -215,7 +223,7 @@ export const LABELS_EN: AccessibilityWidgetLabels = {
   toolUnderlineLinks: "Underline Links",
   toolHighlightHeadings: "Highlight Headings",
   toolReadingLine: "Reading Line",
-  toolMarkerLine: "Yellow Strip",
+  toolReadingGuide: "Reading Guide",
   toolReadingMask: "Reading Mask",
   toolLargeCursor: "Large Cursor",
   toolBlueLight: "Blue Light Filter",
@@ -280,6 +288,10 @@ export const LABELS_EN: AccessibilityWidgetLabels = {
   pageStructureClose: "Close",
   pageStructureRefresh: "Refresh heading list",
   skipLink: "Skip to content",
+  mobileTitle: "Accessibility Tool",
+  mobileTools: "Tools",
+  backToProfiles: "Back to profiles",
+  contentSettings: "Content Settings",
 };
 
 export const DEFAULT_LABELS: AccessibilityWidgetLabels = LABELS_TR;

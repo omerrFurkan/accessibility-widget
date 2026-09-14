@@ -148,11 +148,12 @@ html.a11y-text-spacing
 
 /* --- Composed page-wide filters -----------------------------------------
    Dark mode / inverted / grayscale / blue light / color blindness /
-   reading mask all stack on a single filter property so multiple tools
-   can be active at once. The whole list is composed in JS (never bare
+   warm-cold-light contrast stack on a single filter property so multiple
+   tools can be active at once. The whole list is composed in JS (never bare
    `none` items, which would invalidate the declaration). The filter
-   applies to <body> only: the widget container lives outside <body>, so
-   the widget UI is never filtered.
+   applies to <body> only: the widget container lives outside <body>, so it
+   is NOT filtered implicitly — the same list is mirrored explicitly onto
+   the widget root (see "Widget filter mirror" below).
    ------------------------------------------------------------------------ */
 body.a11y-filtered {
   filter: var(--a11y-filter, none);
@@ -182,6 +183,117 @@ html.a11y-dark-mode body {
 html.a11y-dark-mode
   :where(img, video, canvas, iframe, picture, object, embed, [role="img"]):not(.a11y-widget-root *) {
   filter: invert(1) hue-rotate(180deg);
+}
+
+/* --- Contrast palettes (WCAG 2.2 AA: body text >= 4.5:1) --------------------
+   Class-based palettes; literals mirror CONTRAST_PALETTES in
+   src/context/contrast-palettes.ts — keep the two in sync.
+   The widget panel is always excluded so it stays usable.
+   -------------------------------------------------------------------------- */
+
+/* Dark: #121212 bg / #ffffff text (18.7:1), links #8ab4f8 (8.9:1). */
+html.a11y-contrast-dark body {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+html.a11y-contrast-dark
+  :where(p, li, span, div, section, article, header, footer, nav, aside, blockquote, td, th, caption, label, dt, dd, ul, ol, main):not(
+    .a11y-widget-root *
+  ) {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-dark :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-dark
+  :where(a, button, input, select, textarea, [role="button"]):not(.a11y-widget-root *) {
+  color: #8ab4f8 !important;
+  border-color: #8ab4f8 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-dark
+  :where(img, video, canvas, iframe, picture, object, embed, [role="img"]):not(.a11y-widget-root *) {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Light: #ffffff bg / #111111 text (18.9:1), links #0b57d0 (6.4:1). */
+html.a11y-contrast-light body {
+  background-color: #ffffff !important;
+  color: #111111 !important;
+}
+html.a11y-contrast-light
+  :where(p, li, span, div, section, article, header, footer, nav, aside, blockquote, td, th, caption, label, dt, dd, ul, ol, main):not(
+    .a11y-widget-root *
+  ) {
+  color: #111111 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-light :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  color: #111111 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-light
+  :where(a, button, input, select, textarea, [role="button"]):not(.a11y-widget-root *) {
+  color: #0b57d0 !important;
+  border-color: #0b57d0 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-light :where(img, video, iframe):not(.a11y-widget-root *) {
+  filter: brightness(1.02) contrast(1.05);
+}
+
+/* Warm: #fdf6e3 cream bg / #433006 text (11.7:1), links #7c2d12 (8.7:1). */
+html.a11y-contrast-warm body {
+  background-color: #fdf6e3 !important;
+  color: #433006 !important;
+}
+html.a11y-contrast-warm
+  :where(p, li, span, div, section, article, header, footer, nav, aside, blockquote, td, th, caption, label, dt, dd, ul, ol, main):not(
+    .a11y-widget-root *
+  ) {
+  color: #433006 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-warm :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  color: #433006 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-warm
+  :where(a, button, input, select, textarea, [role="button"]):not(.a11y-widget-root *) {
+  color: #7c2d12 !important;
+  border-color: #7c2d12 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-warm :where(img, video, iframe):not(.a11y-widget-root *) {
+  filter: sepia(0.3) contrast(1.02);
+}
+
+/* Cold: #edf3f8 bg / #0b2b40 text (13.1:1), links #0b4f8a (7.5:1). */
+html.a11y-contrast-cold body {
+  background-color: #edf3f8 !important;
+  color: #0b2b40 !important;
+}
+html.a11y-contrast-cold
+  :where(p, li, span, div, section, article, header, footer, nav, aside, blockquote, td, th, caption, label, dt, dd, ul, ol, main):not(
+    .a11y-widget-root *
+  ) {
+  color: #0b2b40 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-cold :where(h1, h2, h3, h4, h5, h6):not(.a11y-widget-root *) {
+  color: #0b2b40 !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-cold
+  :where(a, button, input, select, textarea, [role="button"]):not(.a11y-widget-root *) {
+  color: #0b4f8a !important;
+  border-color: #0b4f8a !important;
+  background-color: transparent !important;
+}
+html.a11y-contrast-cold :where(img, video, iframe):not(.a11y-widget-root *) {
+  filter: hue-rotate(8deg) saturate(1.05);
 }
 
 /* --- Contrast: high ----------------------------------------------------- */
@@ -232,6 +344,21 @@ html.a11y-high-contrast .a11y-widget-root .a11y-tool-dot {
 html.a11y-high-contrast .a11y-widget-root .a11y-tool-dot.a11y-tool-dot-on {
   background: #ffff00 !important;
   opacity: 1;
+}
+/* Active tool buttons keep a near-white background by default, which becomes
+   unreadable once the label flips to white — force a black/yellow pairing. */
+html.a11y-high-contrast .a11y-widget-root .a11y-tool-button.a11y-tool-active {
+  background: #000000 !important;
+  border-color: #ffff00 !important;
+  box-shadow: 0 0 0 1px #ffff00 !important;
+  color: #ffff00 !important;
+}
+html.a11y-high-contrast
+  .a11y-widget-root
+  .a11y-tool-button.a11y-tool-active
+  .a11y-tool-icon {
+  background: #ffff00 !important;
+  color: #000000 !important;
 }
 
 /* --- Link highlighting --------------------------------------------------- */
@@ -339,6 +466,40 @@ body.a11y-dyslexia-font
   transition: top 0.05s linear;
 }
 
+/* --- Reading guide ----------------------------------------------------------
+   Slim pointer-following bar with a centered upward triangle
+   (----------^---------). The triangle is drawn with borders so no
+   extra markup or assets are needed.
+   -------------------------------------------------------------------------- */
+.a11y-reading-guide-el {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 30vw;
+  min-width: 160px;
+  height: 16px;
+  border: 4px solid #fff300;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: var(--a11y-widget-accent);
+  transform: translateX(-50%) translateY(-100%);
+  z-index: calc(var(--a11y-widget-z) - 1);
+  transition: left 0.05s linear, top 0.05s linear;
+}
+
+.a11y-reading-guide-el::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 4px);
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 20px solid var(--a11y-widget-accent);
+}
+
 /* --- Reading mask ---------------------------------------------------------
     A cursor-following spotlight: the window under the pointer stays bright,
     everything outside it is softly darkened. Position is driven from JS via
@@ -358,37 +519,6 @@ body.a11y-dyslexia-font
   pointer-events: none;
   z-index: calc(var(--a11y-widget-z) - 1);
   transition: left 0.05s linear, top 0.05s linear;
-}
-
-/* --- Marker line (Ege "Sarı Şerit") ----------------------------------------
-   Translucent yellow band following the pointer; tints content under it via
-   mix-blend-mode like ege.edu.tr. Adaptive variants mirror Ege's CSS: solid
-   multiply band in high contrast, dimmed gray in dark mode.
-   -------------------------------------------------------------------------- */
-.a11y-marker-line-el {
-  position: fixed;
-  left: 0;
-  right: 0;
-  height: 1.75rem;
-  pointer-events: none;
-  background-color: #e4fd00 !important;
-  opacity: 0.75;
-  border-top: 1px solid #cde400;
-  border-bottom: 1px solid #cde400;
-  mix-blend-mode: color;
-  z-index: calc(var(--a11y-widget-z) - 1);
-  transition: top 0.05s linear;
-}
-
-html.a11y-high-contrast .a11y-marker-line-el {
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-
-html.a11y-dark-mode .a11y-marker-line-el {
-  background-color: #655b5b !important;
-  opacity: 0.25;
-  mix-blend-mode: unset;
 }
 
 /* --- Screen-reader only (live regions) --------------------------------------- */
@@ -699,8 +829,22 @@ html.a11y-dark-mode .a11y-marker-line-el {
 /* --- Scrollbar ---------------------------------------------------------------- */
 .a11y-widget-root .a11y-panel-scroll {
   scrollbar-width: thin;
+  overscroll-behavior-y: contain;
   scrollbar-color: color-mix(in srgb, var(--a11y-widget-accent) 60%, #ffffff)
     #eef1f6;
+}
+
+/* Pinned profiles + enlarge row: stays docked at the top of the scroll area
+   while the tools grid scrolls beneath. Negative margins cancel the scroll
+   container's padding so the block spans full-bleed with an opaque backdrop. */
+.a11y-widget-root .a11y-panel-pinned {
+  position: sticky;
+  top: calc(-16px * var(--a11y-panel-em));
+  z-index: 10;
+  background: var(--a11y-widget-bg);
+  margin: calc(-16px * var(--a11y-panel-em)) calc(-16px * var(--a11y-panel-em)) 0;
+  padding: calc(16px * var(--a11y-panel-em)) calc(16px * var(--a11y-panel-em))
+    calc(12px * var(--a11y-panel-em));
 }
 
 .a11y-widget-root .a11y-panel-scroll::-webkit-scrollbar {
@@ -719,7 +863,14 @@ html.a11y-dark-mode .a11y-marker-line-el {
 /* --- Profiles list scrollbar ---------------------------------------------------- */
 .a11y-widget-root .a11y-profiles-list {
   scrollbar-width: thin;
+  overscroll-behavior-y: contain;
   scrollbar-color: color-mix(in srgb, var(--a11y-widget-accent) 25%, transparent) transparent;
+}
+
+/* Enlarged panel: the list's fixed 185px cap must grow with the rows,
+   otherwise fewer profiles fit and the layout jumps on toggle. */
+.a11y-widget-root.a11y-panel-enlarged .a11y-profiles-list {
+  max-height: calc(185px * var(--a11y-panel-em)) !important;
 }
 
 .a11y-widget-root .a11y-profiles-list::-webkit-scrollbar {
@@ -775,4 +926,351 @@ html.a11y-dark-mode .a11y-marker-line-el {
   outline: 3px solid var(--a11y-widget-accent, #1e3e7a) !important;
   outline-offset: 2px !important;
   background-color: rgba(255, 237, 160, 0.45) !important;
+}
+
+/* ==========================================================================
+   Mobile menu (<=640px) — two views: profiles card + tools icon rail
+   ========================================================================== */
+.a11y-widget-root .a11y-mobile-menu {
+  position: fixed;
+  top: max(80px, env(safe-area-inset-top, 0px));
+  right: 0;
+  height: calc(100dvh - 92px);
+  width: min(192px, 54vw);
+  z-index: var(--a11y-widget-z);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-radius: 16px 0 0 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+}
+
+.a11y-widget-root .a11y-mobile-menu.a11y-mobile-open {
+  transform: translateX(0);
+}
+
+.a11y-widget-root .a11y-mobile-menu.a11y-mobile-closed {
+  transform: translateX(100%);
+}
+
+/* --- Profiles view -------------------------------------------------------- */
+.a11y-widget-root .a11y-mobile-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--a11y-widget-muted);
+}
+
+.a11y-widget-root .a11y-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 10px 8px;
+  background: var(--a11y-widget-accent);
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.a11y-widget-root .a11y-mobile-title {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.a11y-widget-root .a11y-mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.a11y-widget-root .a11y-mobile-header-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  border-radius: 7px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.a11y-widget-root .a11y-mobile-header-actions button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.a11y-widget-root .a11y-mobile-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.a11y-widget-root .a11y-mobile-card {
+  background: var(--a11y-widget-bg);
+  border: 1px solid var(--a11y-widget-border);
+  border-radius: 14px;
+  padding: 10px 8px;
+}
+
+.a11y-widget-root .a11y-mobile-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--a11y-widget-text);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.a11y-widget-root .a11y-mobile-card-head svg {
+  width: 20px;
+  height: 20px;
+  color: var(--a11y-widget-accent);
+  transition: transform 0.2s ease;
+}
+
+.a11y-widget-root .a11y-mobile-card-head svg.a11y-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.a11y-widget-root .a11y-mobile-profiles {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.a11y-widget-root .a11y-mobile-profiles li {
+  border: 1px solid var(--a11y-widget-border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: var(--a11y-widget-bg);
+}
+
+.a11y-widget-root .a11y-mobile-profiles li.a11y-mobile-profile-active {
+  border-color: var(--a11y-widget-accent);
+  background: var(--a11y-widget-accent);
+}
+
+.a11y-widget-root .a11y-mobile-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row button:first-child {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--a11y-widget-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px;
+  text-align: left;
+}
+
+.a11y-widget-root .a11y-mobile-profiles li.a11y-mobile-profile-active .a11y-mobile-profile-row button:first-child {
+  color: #ffffff;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row button:first-child svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row button:first-child span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row > button:last-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--a11y-widget-muted);
+  color: var(--a11y-widget-text);
+  cursor: pointer;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row > button:last-child svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Single-button tool rows (no info button): undo the info-circle styling. */
+.a11y-widget-root .a11y-mobile-profile-row > button:first-child:last-child {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+}
+
+.a11y-widget-root .a11y-mobile-profiles li p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--a11y-widget-text);
+  opacity: 0.75;
+}
+
+.a11y-widget-root .a11y-mobile-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: var(--a11y-widget-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.a11y-widget-root .a11y-mobile-reset svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Tools rail view ------------------------------------------------------ */
+.a11y-widget-root .a11y-mobile-railview {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  background: transparent;
+}
+
+.a11y-widget-root .a11y-mobile-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-radius: 12px 0 0 12px;
+  background: var(--a11y-widget-accent);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  flex-shrink: 0;
+}
+
+.a11y-widget-root .a11y-mobile-bar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.a11y-widget-root .a11y-mobile-bar button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.a11y-widget-root .a11y-mobile-rail {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 134px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 10px;
+  border-radius: 12px 12px 0 0;
+  background: var(--a11y-widget-muted);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16);
+}
+
+.a11y-widget-root .a11y-mobile-railbutton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 88px;
+  border: 1.5px solid var(--a11y-widget-border);
+  border-radius: 12px;
+  background: var(--a11y-widget-bg);
+  color: var(--a11y-widget-accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.a11y-widget-root .a11y-mobile-railbutton svg {
+  width: 26px;
+  height: 26px;
+}
+
+.a11y-widget-root .a11y-mobile-railbutton.a11y-rail-active {
+  background: var(--a11y-widget-accent);
+  border-color: var(--a11y-widget-accent);
+  color: #ffffff;
+}
+
+.a11y-widget-root .a11y-mobile-menu button:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* High contrast: keep rail icons readable on the dark menu. */
+html.a11y-high-contrast .a11y-widget-root .a11y-mobile-railbutton {
+  color: #ffff00;
+}
+
+html.a11y-high-contrast .a11y-widget-root .a11y-mobile-railbutton.a11y-rail-active {
+  background: #ffff00;
+  border-color: #ffff00;
+  color: #000000;
+}
+
+html.a11y-high-contrast .a11y-widget-root .a11y-mobile-card-head svg {
+  color: #ffff00;
 }

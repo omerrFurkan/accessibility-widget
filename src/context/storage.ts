@@ -22,7 +22,7 @@ const BOOLEAN_KEYS: readonly (keyof AccessibilitySettings)[] = [
   "underlineLinks",
   "highlightHeadings",
   "readingLine",
-  "markerLine",
+  "readingGuide",
   "hideImages",
   "stopAnimations",
   "largeCursor",

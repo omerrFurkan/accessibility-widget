@@ -118,14 +118,18 @@ test.describe("Araçlar (sayfa üzerindeki etki doğrulaması)", () => {
     await fresh(page);
     await openPanel(page);
     const btn = page.getByRole("button", { name: /Kontrast Modu/ });
-    await btn.click(); // dark
-    expect(await bodyClass(page, "a11y-filtered")).toBe(true);
+    await btn.click(); // dark — palette class, no body filter
+    expect(await htmlClass(page, "a11y-contrast-dark")).toBe(true);
+    expect(await bodyClass(page, "a11y-filtered")).toBe(false);
     await btn.click(); // light
+    expect(await htmlClass(page, "a11y-contrast-light")).toBe(true);
     await btn.click(); // high
     expect(await htmlClass(page, "a11y-high-contrast")).toBe(true);
-    await btn.click(); // warm — filter mode, class removed
+    await btn.click(); // warm — palette class, high removed
     expect(await htmlClass(page, "a11y-high-contrast")).toBe(false);
+    expect(await htmlClass(page, "a11y-contrast-warm")).toBe(true);
     await btn.click(); // cold
+    expect(await htmlClass(page, "a11y-contrast-cold")).toBe(true);
     await btn.click(); // back to normal
     await expect(page.getByRole("button", { name: "Kontrast Modu: Normal" })).toBeVisible();
     expect(await htmlClass(page, "a11y-high-contrast")).toBe(false);
@@ -172,21 +176,14 @@ test.describe("Araçlar (sayfa üzerindeki etki doğrulaması)", () => {
     expect(decor).toContain("underline");
   });
 
-  test("okuma çizgisi ve sarı şerit fareyi takip eder", async ({ page }) => {
+  test("okuma çizgisi fareyi takip eder", async ({ page }) => {
     await fresh(page);
     await openPanel(page);
     await page.getByRole("button", { name: "Okuma Çizgisi" }).click();
-    await page.getByRole("button", { name: "Sarı Şerit" }).click();
-    expect(await bodyClass(page, "a11y-marker-line")).toBe(true);
     await page.mouse.move(300, 420);
-    const stripTop = await page.locator(".a11y-marker-line-el").evaluate(
-      (el) => parseFloat((el as HTMLElement).style.top),
-    );
     const lineTop = await page.locator(".a11y-reading-line-el").evaluate(
       (el) => parseFloat((el as HTMLElement).style.top),
     );
-    expect(stripTop).toBeGreaterThan(380);
-    expect(stripTop).toBeLessThan(420);
     expect(lineTop).toBeGreaterThan(380);
     expect(lineTop).toBeLessThan(430);
   });
