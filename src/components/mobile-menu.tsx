@@ -253,6 +253,8 @@ export function MobileMenu({
               )}
             </section>
 
+          </div>
+          <div className="a11y-mobile-footer">
             <button type="button" className="a11y-mobile-reset" onClick={onReset}>
               <RotateCcw aria-hidden="true" />
               {labels.resetAll}

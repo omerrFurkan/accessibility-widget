@@ -1189,6 +1189,13 @@ body.a11y-dyslexia-font
   opacity: 0.75;
 }
 
+.a11y-widget-root .a11y-mobile-footer {
+  flex-shrink: 0;
+  padding: 10px 8px 12px;
+  border-top: 1px solid var(--a11y-widget-border);
+  background: var(--a11y-widget-muted);
+}
+
 .a11y-widget-root .a11y-mobile-reset {
   display: inline-flex;
   align-items: center;
