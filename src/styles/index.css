@@ -976,11 +976,18 @@ body.a11y-dyslexia-font
 }
 
 .a11y-widget-root .a11y-mobile-title {
-  font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(9px, 2.8vw, 11px);
   font-weight: 700;
+  line-height: 1.15;
+}
+
+.a11y-widget-root .a11y-mobile-title-line {
+  display: block;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .a11y-widget-root .a11y-mobile-header-actions {

@@ -105,7 +105,13 @@ export function MobileMenu({
       {view === "profiles" ? (
         <div className="a11y-mobile-main">
           <header className="a11y-mobile-header">
-            <span className="a11y-mobile-title">{labels.mobileTitle}</span>
+            <span className="a11y-mobile-title" aria-label={labels.mobileTitle}>
+              {labels.mobileTitle.split(" ").map((word, i) => (
+                <span key={i} className="a11y-mobile-title-line">
+                  {word}
+                </span>
+              ))}
+            </span>
             <span className="a11y-mobile-header-actions">
               <button type="button" onClick={goTools} aria-label={labels.mobileTools}>
                 <BookOpen aria-hidden="true" />
