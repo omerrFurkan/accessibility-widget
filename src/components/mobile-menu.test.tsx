@@ -70,8 +70,31 @@ describe("MobileMenu", () => {
   it("toggles a tool from the rail", async () => {
     const { user, page } = await openMenu();
     await user.click(page.getByRole("button", { name: "Araçlar" }));
+    const zoom = page.getByRole("button", { name: "Metin Büyütme: %100" });
+    expect(zoom.querySelectorAll(".a11y-tool-dot")).toHaveLength(3);
+    expect(zoom.querySelectorAll(".a11y-tool-dot-on")).toHaveLength(0);
     await user.click(page.getByRole("button", { name: "Koyu Mod" }));
     expect(document.documentElement.classList.contains("a11y-dark-mode")).toBe(true);
+  });
+
+  it("shows progress dots in the content settings card", async () => {    const { user, page } = await openMenu();
+    const zoom = page.getByRole("button", { name: "Metin Büyütme: %100" });
+    expect(zoom.querySelectorAll(".a11y-tool-dot")).toHaveLength(3);
+    expect(zoom.querySelectorAll(".a11y-tool-dot-on")).toHaveLength(0);
+    await user.click(zoom);
+    expect(
+      page
+        .getByRole("button", { name: "Metin Büyütme: %125" })
+        .querySelectorAll(".a11y-tool-dot-on"),
+    ).toHaveLength(1);
+  });
+
+  it("writes the active mode into the card row text", async () => {
+    const { user, page } = await openMenu();
+    await user.click(page.getByRole("button", { name: "Metin Hizalama: Normal" }));
+    const active = page.getByRole("button", { name: "Metin Hizalama: Sola Hizala" });
+    expect(active).toBeInTheDocument();
+    expect(active.textContent).toContain("Sola Hizala");
   });
 
   it("toggles a tool from the content settings card", async () => {

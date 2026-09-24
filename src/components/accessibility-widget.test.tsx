@@ -178,6 +178,20 @@ describe("AccessibilityWidget", () => {
     expect(page.getByRole("button", { name: "Metin Büyütme: %100" })).toBeInTheDocument();
   });
 
+  it("writes the active alignment into the grid button label", async () => {
+    const user = userEvent.setup();
+    render(
+      <AccessibilityProvider storageKey={KEY}>
+        <AccessibilityWidget />
+      </AccessibilityProvider>,
+    );
+    const page = documentQueries();
+    await user.click(page.getByRole("button", { name: "Erişilebilirlik ayarları" }));
+    await user.click(page.getByRole("button", { name: "Metin Hizalama: Normal" }));
+    const active = page.getByRole("button", { name: "Metin Hizalama: Sola Hizala" });
+    expect(active.textContent).toContain("Sola Hizala");
+  });
+
   it("applies a profile and clears the marker on manual changes", async () => {
     const user = userEvent.setup();
     render(

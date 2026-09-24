@@ -205,6 +205,8 @@ export function MobileMenu({
                 <ul className="a11y-mobile-profiles">
                   {tools.map((tool) => {
                     const Icon = tool.icon;
+                    const dotCount = tool.dotCount ?? 0;
+                    const onDots = Math.min(Math.max(0, tool.level ?? 0), dotCount);
                     return (
                       <li
                         key={tool.id}
@@ -216,9 +218,25 @@ export function MobileMenu({
                             onClick={tool.onClick}
                             aria-pressed={tool.active}
                             aria-label={tool.ariaLabel}
+                            title={tool.ariaLabel}
                           >
                             <Icon aria-hidden="true" />
-                            <span>{tool.label}</span>
+                            <span className="a11y-mobile-tool-text">
+                              <span className="a11y-mobile-tool-name">{tool.ariaLabel}</span>
+                              {dotCount > 0 && (
+                                <span className="a11y-tool-dots" aria-hidden="true">
+                                  {Array.from({ length: dotCount }, (_, index) => (
+                                    <span
+                                      key={index}
+                                      className={cn(
+                                        "a11y-tool-dot",
+                                        index < onDots && "a11y-tool-dot-on",
+                                      )}
+                                    />
+                                  ))}
+                                </span>
+                              )}
+                            </span>
                             {tool.active && <Check aria-hidden="true" />}
                           </button>
                         </div>
@@ -251,6 +269,8 @@ export function MobileMenu({
           <div className="a11y-mobile-rail" role="group" aria-label={labels.mobileTools}>
             {tools.map((tool) => {
               const Icon = tool.icon;
+              const dotCount = tool.dotCount ?? 0;
+              const onDots = Math.min(Math.max(0, tool.level ?? 0), dotCount);
               return (
                 <button
                   key={tool.id}
@@ -262,6 +282,16 @@ export function MobileMenu({
                   onClick={tool.onClick}
                 >
                   <Icon aria-hidden="true" />
+                  {dotCount > 0 && (
+                    <span className="a11y-tool-dots" aria-hidden="true">
+                      {Array.from({ length: dotCount }, (_, index) => (
+                        <span
+                          key={index}
+                          className={cn("a11y-tool-dot", index < onDots && "a11y-tool-dot-on")}
+                        />
+                      ))}
+                    </span>
+                  )}
                 </button>
               );
             })}

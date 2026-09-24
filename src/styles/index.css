@@ -1110,9 +1110,41 @@ body.a11y-dyslexia-font
 .a11y-widget-root .a11y-mobile-profile-row button:first-child span {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+/* Tool rows in the content-settings card: label over progress dots. */
+.a11y-widget-root .a11y-mobile-profile-row button:first-child .a11y-mobile-tool-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  overflow: visible;
+  white-space: normal;
+}
+
+.a11y-widget-root .a11y-mobile-profile-row button:first-child .a11y-mobile-tool-name {
+  flex: none;
+  max-width: 100%;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+.a11y-widget-root .a11y-mobile-tool-text .a11y-tool-dots {
+  flex: none;
+}
+
+.a11y-widget-root .a11y-mobile-profiles li.a11y-mobile-profile-active .a11y-tool-dot {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.a11y-widget-root
+  .a11y-mobile-profiles
+  li.a11y-mobile-profile-active
+  .a11y-tool-dot.a11y-tool-dot-on {
+  background: #ffffff;
 }
 
 .a11y-widget-root .a11y-mobile-profile-row > button:last-child {
@@ -1232,8 +1264,10 @@ body.a11y-dyslexia-font
 
 .a11y-widget-root .a11y-mobile-railbutton {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   width: 100%;
   min-height: 88px;
   border: 1.5px solid var(--a11y-widget-border);
@@ -1247,6 +1281,19 @@ body.a11y-dyslexia-font
 .a11y-widget-root .a11y-mobile-railbutton svg {
   width: 26px;
   height: 26px;
+  flex-shrink: 0;
+}
+
+.a11y-widget-root .a11y-mobile-railbutton .a11y-tool-dots {
+  margin-top: 0;
+}
+
+.a11y-widget-root .a11y-mobile-railbutton.a11y-rail-active .a11y-tool-dot {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.a11y-widget-root .a11y-mobile-railbutton.a11y-rail-active .a11y-tool-dot.a11y-tool-dot-on {
+  background: #ffffff;
 }
 
 .a11y-widget-root .a11y-mobile-railbutton.a11y-rail-active {
@@ -1269,6 +1316,40 @@ html.a11y-high-contrast .a11y-widget-root .a11y-mobile-railbutton.a11y-rail-acti
   background: #ffff00;
   border-color: #ffff00;
   color: #000000;
+}
+
+html.a11y-high-contrast
+  .a11y-widget-root
+  .a11y-mobile-railbutton.a11y-rail-active
+  .a11y-tool-dot {
+  background: #000000;
+  opacity: 0.35;
+}
+
+html.a11y-high-contrast
+  .a11y-widget-root
+  .a11y-mobile-railbutton.a11y-rail-active
+  .a11y-tool-dot.a11y-tool-dot-on {
+  background: #000000;
+  opacity: 1;
+}
+
+html.a11y-high-contrast
+  .a11y-widget-root
+  .a11y-mobile-profiles
+  li.a11y-mobile-profile-active
+  .a11y-tool-dot {
+  background: #000000;
+  opacity: 0.35;
+}
+
+html.a11y-high-contrast
+  .a11y-widget-root
+  .a11y-mobile-profiles
+  li.a11y-mobile-profile-active
+  .a11y-tool-dot.a11y-tool-dot-on {
+  background: #000000;
+  opacity: 1;
 }
 
 html.a11y-high-contrast .a11y-widget-root .a11y-mobile-card-head svg {

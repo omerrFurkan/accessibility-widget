@@ -182,6 +182,11 @@ export function useTools({
 
   const alignIndex = TEXT_ALIGN_LEVELS.indexOf(settings.textAlign);
   const alignActive = settings.textAlign !== "none";
+  const alignLabel = alignActive
+    ? `${labels.toolTextAlign} (${
+        labels[ALIGN_NAMES[settings.textAlign as Exclude<TextAlignMode, "none">]]
+      })`
+    : labels.toolTextAlign;
 
   const vrIndex = VOICE_READING_LEVELS.indexOf(settings.voiceReading);
   const voiceActive = settings.voiceReading !== "none";
@@ -379,7 +384,7 @@ export function useTools({
     {
       id: "text-align",
       icon: AlignLeft,
-      label: labels.toolTextAlign,
+      label: alignLabel,
       active: alignActive,
       level: alignActive ? alignIndex + 1 : 0,
       dotCount: 4,
